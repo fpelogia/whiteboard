@@ -7,7 +7,7 @@
 
 ## Requisitos
 
-### Deve fornecer ferramentas e funcionalidades básicas de ferramentas de
+### Deve fornecer ferramentas e funcionalidades básicas de ferramentas de paint
 
 #### Deve ter as ferramentas:
 
