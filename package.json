@@ -13,7 +13,7 @@
     "collaborative"
   ],
   "author": "Frederico José Ribeiro Pelogia",
-  "license": "ISC",
+  "license": "GPLv3",
   "dependencies": {
     "express": "^4.17.1",
     "mathjax": "^3.1.4",
