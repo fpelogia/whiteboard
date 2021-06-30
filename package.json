@@ -1,0 +1,22 @@
+{
+  "name": "whiteboard",
+  "version": "1.0.0",
+  "description": "Collaborative whiteboard with LaTeX support",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "p5.js",
+    "whiteboard",
+    "LaTeX",
+    "collaborative"
+  ],
+  "author": "Frederico José Ribeiro Pelogia",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mathjax": "^3.1.4",
+    "socket.io": "^4.1.1"
+  }
+}
