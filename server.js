@@ -17,12 +17,12 @@ io.sockets.on('connection', newConnection);
 
 function newConnection(socket){
     console.log('New connection:' + socket.id);
-    socket.on('mouse', mouseMsg);
+    socket.on('shapes', shapesMsg);
 
-    function mouseMsg(data){
-        socket.broadcast.emit('mouse', data);
+    function shapesMsg(data){
+        socket.broadcast.emit('shapes', data);
         //caso precise mandar para o cliente que enviou tbm, usar:
-        // io.sockets.emit('mouse', data);
+        // io.sockets.emit('shapes', data);
         console.log(data);
     }
 }
