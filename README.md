@@ -13,10 +13,11 @@
 
 - **Caixa para seleção de cor**
     - cores pré-definidas (preto, azul, vermelho, verde, amarelo)
-    - (talvez) seleção manual
+    - seleção manual
 - **Ferramenta Pincel**
     - possibilidade de trocar a espessura (valores pré-definidos)
 - **Ferramenta Seleção Retangular**
+    - possibilidade de movimentar a seleção
 - **Ferramenta Borracha (Apagador)**
     - apaga qualquer tipo de tinta
 - **Ferramenta Lata de Tinta**
@@ -30,11 +31,12 @@
 
 #### E as funcionalidades:
 
-- **Desfazer ação (Ctrl + Z)**
+- **Desfazer ação (Ctrl + z)**
     - botão de desfazer
 - **Exportar imagem**
     - formato png
     - (talvez) outros formatos, como jpeg, svg e pdf
+- **Colar imagem da área de transferência (Ctr + v)**
 
 ### Deve possibilitar interpretação de comandos LaTeX
 
