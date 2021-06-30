@@ -24,6 +24,8 @@
     - preenche quaisquer ciclos fechados
 - **Ferramenta Reta**
     - desenha linha reta ao segurar o clique do mouse
+- **Ferramenta Retângulo**
+    - desenha um retângulo ao segurar o clique do mouse
 - **Ferramenta Caixa de Texto**
     - possibilita redimensionamento
     - seleção do tamanho da fonte
