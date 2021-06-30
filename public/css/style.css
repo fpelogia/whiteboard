@@ -1,3 +1,4 @@
+@import '../node_modules/bootstrap-icons/font/bootstrap-icons';
 .title{
     margin-left:25%;
 }
@@ -6,17 +7,16 @@
     padding:10px;
 }
 .tool-bar{
-    width:800px;
-    margin-left:25%;
+    width:1360px;
+    margin-left:10%;
     margin-bottom: 30px;
     text-align:center;
 }
 label{
-    width:auto;
-    height:auto;
+    width:100px;
+    height:80px;
     display:inline-block;
     text-align:center;
-    margin: 0px 2px;
     cursor: pointer;
     background:#e9e9ed;
     border-radius:20px;

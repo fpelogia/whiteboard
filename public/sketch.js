@@ -18,6 +18,7 @@ var tools = ["pincel",
 var ferramenta = "pincel";
 var limparBtn;
 var range;
+var currStrokeWeight = 4;
 function checkTools(){
     var btn;
     for (let i = 0; i< tools.length; i++){
@@ -29,27 +30,27 @@ function checkTools(){
     }
 }
 function setup(){
-    canv = createCanvas(800,600);
+    canv = createCanvas(1360,768);
     canv.parent('canvasP5');
-    canv.style('margin-left', '25%');
+    canv.style('margin-left', '10%');
     canv.style('border', '5px solid');
     radius = 10;
     socket = io.connect('http://localhost:3000');
-    socket.on('mouse', newDrawing); 
-
-    strokeWeight(4);
+    socket.on('shapes', newDrawing); 
     limparBtn = select("#limpar");
     limparBtn.mousePressed(limpaTela);
     limparBtn = select("#desfazer");
     limparBtn.mousePressed(undoDrawing);
     range = select("#raio");
     range.changed(changeRadius);
+    changeRadius();
+    strokeWeight(currStrokeWeight);
 }
 function undoDrawing(){
     shapes.pop();
 }
 function changeRadius(){
-    strokeWeight(range.elt.value);
+    currStrokeWeight = range.elt.value;
 }
 
 function draw(){
@@ -57,17 +58,18 @@ function draw(){
     lastMouseStatus = mouseInsideCanvas();
     if(!drawing){
         background(255);
-    }
-    noFill();
-    for (let i = 0; i < shapes.length; i++){
-        drawShape(shapes[i]);
+        noFill();
+        for (let i = 0; i < shapes.length; i++){
+            drawShape(shapes[i]);
+        }
     }
 }
 
 function drawShape(shlist){
   beginShape();
   for (let i = 1; i < shlist.length; i++){
-    //fill(shlist[i].color);
+    strokeWeight(shlist[i].sw);
+    stroke(shlist[i].color);
     line(shlist[i-1].x, shlist[i-1].y,shlist[i].x, shlist[i].y);
   }
   endShape();
@@ -81,33 +83,13 @@ function mouseInsideCanvas(){
 }
 
 function newDrawing(data){
-    if(!data.borracha){
-        stroke(200,0,0);
-    }else if(data.retangulo){
-
-    }else{
-        stroke(255);
-    }
-    line(data.x, data.y, data.px, data.py);
+    shapes = data.shapes;
+    shapes.push(data.temp);
 }
 
 function limpaTela(){
     temp = [];
     shapes = [];
-}
-
-function ativaBorracha(){
-    borracha = true;
-    retangulo = false;
-}
-
-function ativaRetangulo(){
-    retangulo = true;
-}
-
-function ativaPincel(){
-    borracha = false;
-    retangulo = false;
 }
 
 function mouseReleased(){
@@ -144,30 +126,29 @@ function mouseDragged(){
     switch(ferramenta){
         case "pincel":
             stroke(0);//preto
+            strokeWeight(currStrokeWeight);
             line(pmouseX, pmouseY, mouseX, mouseY);
-            temp.push({ x: pmouseX, y: pmouseY, color: '#000000'});
-            temp.push({ x: mouseX, y: mouseY , color: '#000000'});
+            temp.push({ x: pmouseX, y: pmouseY, color: '#000000', sw: currStrokeWeight });
+            temp.push({ x: mouseX, y: mouseY , color: '#000000', sw: currStrokeWeight});
             break;
         case "borracha":
             stroke(255);//branco
-            //strokeWeight(15);
+            strokeWeight(currStrokeWeight);
             line(pmouseX, pmouseY, mouseX, mouseY);
-            temp.push({ x: pmouseX, y: pmouseY, color: '#ffffff'});
-            temp.push({ x: mouseX, y: mouseY , color: '#ffffff'});
+            temp.push({ x: pmouseX, y: pmouseY, color: '#ffffff', sw: currStrokeWeight});
+            temp.push({ x: mouseX, y: mouseY , color: '#ffffff',  sw: currStrokeWeight});
             break;    
         case "retangulo":
             break;
    }
     //console.log("Coordenada = ("+mouseX+","+mouseY+")");
     var data = {
-        x: mouseX,
-        y: mouseY,
-        px: pmouseX,
-        py: pmouseY,
-        ferramenta: ferramenta
+        shapes: shapes,
+        temp: temp
     }
-    socket.emit('mouse', data);
+    socket.emit('shapes', data);
 }
+
 function keyPressed(){
   if(keyCode == 32){
       undoDrawing();
