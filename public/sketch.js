@@ -64,6 +64,7 @@ function checkTools(){
 }
 function undoDrawing(){
     shapes.pop();
+    emitDrawing();
 }
 function changeRadius(){
     currStrokeWeight = range.elt.value;
@@ -88,6 +89,7 @@ function drawShape(shlist){
     endShape();
 }
 function drawShapes(){
+    background(255);
     noFill();
     for (let i = 0; i < shapes.length; i++){
         drawShape(shapes[i]);
@@ -104,11 +106,13 @@ function mouseInsideCanvas(){
 function newDrawing(data){
     shapes = data.shapes;
     shapes.push(data.temp);
+    drawShapes();
 }
 
 function limpaTela(){
     temp = [];
     shapes = [];
+    emitDrawing();
 }
 
 function mouseReleased(){
@@ -135,6 +139,8 @@ function mouseReleased(){
     temp = []
     background(255);
     drawShapes();
+
+    emitDrawing();
 }
 function mousePressed(){
     if(ferramenta == "retangulo" || ferramenta == "reta"){
@@ -187,11 +193,17 @@ function mouseDragged(){
             break;
    }
 
-    var data = {
-        shapes: shapes,
-        temp: temp
-    }
-    socket.emit('shapes', data);
+   emitDrawing();
+
+}
+
+function emitDrawing(){
+
+   var data = {
+       shapes: shapes,
+       temp: temp
+   }
+   socket.emit('shapes', data);
 }
 
 function keyPressed(){
