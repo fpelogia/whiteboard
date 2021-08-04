@@ -3,7 +3,9 @@ var socket;
 var fr = 60;
 var drawing = false;
 let temp = [];
+let temp_texto = [];
 let shapes = [];
+let texto_tela = [];
 var lastMouseStatus;
 var tools = ["pincel",
              "borracha",
@@ -19,7 +21,13 @@ var currStrokeWeight = 4;
 var savedX;
 var savedY;
 var seletorCor;
+var caixaTexto;
 var currentColor;
+var x1_text = 0;
+var y1_text = 0;
+var x2_text = 0;
+var y2_text = 0;
+var texto = "";
 
 function setup(){
     canv = createCanvas(1360,768);
@@ -42,6 +50,9 @@ function setup(){
     seletorCor = select('#cor');
     seletorCor.changed(changeColor);
     changeColor();
+    //caixa de texto
+    caixaTexto = select('#caixa_texto');
+    caixaTexto.input(atualizaTexto);
 
     strokeWeight(currStrokeWeight);
     background(255); // pinta o fundo de branco
@@ -95,6 +106,14 @@ function drawShapes(){
         drawShape(shapes[i]);
     }
 }
+
+function escreveTextos(){
+    //background(255);
+    noFill();
+    for (let i = 0; i < texto_tela.length; i++){
+        escreveTexto(texto_tela[i]);
+    }
+}
 function mouseInsideCanvas(){
     if(mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height ){
         return true;
@@ -113,6 +132,15 @@ function limpaTela(){
     temp = [];
     shapes = [];
     emitDrawing();
+}
+
+function atualizaTexto() {
+  console.log(this.value());
+  //background(200);
+  fill(0);
+  textSize(28);
+  texto = this.value()
+  text(texto, x1_text, y1_text, x2_text, y2_text); 
 }
 
 function mouseReleased(){
@@ -146,6 +174,10 @@ function mousePressed(){
     if(ferramenta == "retangulo" || ferramenta == "reta"){
         savedX = mouseX;
         savedY = mouseY;
+    }
+    if(ferramenta == "texto"){
+        x1_text = mouseX;
+        y1_text = mouseY;
     }
 }
 function mouseLeftCanvas(){
@@ -189,6 +221,18 @@ function mouseDragged(){
             line(savedX, savedY, mouseX, mouseY);
             // apenas para visualização. armazenamento é feito no mouseReleased
             break;
+        case "texto":
+            background(255);
+            drawShapes();
+            noFill();
+            stroke(150);
+            rect(x1_text, y1_text, mouseX - x1_text, mouseY - y1_text);
+            noStroke();
+            x2_text = mouseX - x1_text;
+            y2_text = mouseY - y1_text;
+            fill(0);
+            textSize(28);
+            text(texto, x1_text,y1_text, x2_text, y2_text); 
         default:
             break;
    }

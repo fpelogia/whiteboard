@@ -42,6 +42,11 @@ input:checked + label{
     background:#b1b1b9;
     border-color: #8f8f9d;
 }
+textarea{
+    width:1360px;
+    font-size:18pt;
+    font-family:sans-serif;
+}
 
 /* RANGE*/
 input[type=range] {
