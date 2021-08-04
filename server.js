@@ -4,7 +4,7 @@
  * */
 var express = require('express');
 var app = express();
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 80;
 
 var server = app.listen(PORT, () => console.log(`Server is listening on port ${PORT}...`));
 app.use(express.static('public'));

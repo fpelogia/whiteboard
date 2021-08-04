@@ -37,7 +37,7 @@ function setup(){
     canv.style('margin-left', '-50%');
     canv.style('border', '5px solid');
     //conexão com
-    socket = io.connect('http://localhost:3000');
+    socket = io.connect('http://localhost:80');
     socket.on('shapes', newDrawing); 
     //botão de limpar tela
     limparBtn = select("#limpar");
