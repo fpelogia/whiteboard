@@ -4,7 +4,9 @@
  * */
 var express = require('express');
 var app = express();
-var server = app.listen(3000);
+const PORT = process.env.PORT || 5001;
+
+var server = app.listen(PORT, () => console.log(`Server is listening on port ${PORT}...`));
 app.use(express.static('public'));
 
 console.log("Servidor rodando!");
