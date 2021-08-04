@@ -6,6 +6,7 @@ let temp = [];
 let temp_texto = [];
 let shapes = [];
 let texto_tela = [];
+let text_or_shape = [];
 var lastMouseStatus;
 var tools = ["pincel",
              "borracha",
@@ -28,11 +29,12 @@ var y1_text = 0;
 var x2_text = 0;
 var y2_text = 0;
 var texto = "";
+var output;
 
 function setup(){
     canv = createCanvas(1360,768);
     canv.parent('canvasP5');
-    canv.style('margin-left', '10%');
+    canv.style('margin-left', '-50%');
     canv.style('border', '5px solid');
     //conexão com
     socket = io.connect('http://localhost:3000');
@@ -54,6 +56,8 @@ function setup(){
     caixaTexto = select('#caixa_texto');
     caixaTexto.input(atualizaTexto);
 
+    output = select('#output');
+
     strokeWeight(currStrokeWeight);
     background(255); // pinta o fundo de branco
 }
@@ -74,7 +78,12 @@ function checkTools(){
     }
 }
 function undoDrawing(){
-    shapes.pop();
+    var ch = text_or_shape.pop();
+    if(ch == 't'){
+        texto_tela.pop();
+    }else if(ch == 's'){
+        shapes.pop();
+    }
     emitDrawing();
 }
 function changeRadius(){
@@ -105,6 +114,8 @@ function drawShapes(){
     for (let i = 0; i < shapes.length; i++){
         drawShape(shapes[i]);
     }
+    strokeWeight(1);
+    escreveTextos();
 }
 
 function escreveTextos(){
@@ -114,6 +125,15 @@ function escreveTextos(){
         escreveTexto(texto_tela[i]);
     }
 }
+function escreveTexto(text_el){
+    stroke(text_el.color);
+    fill(text_el.color);
+    textSize(28);
+    text(text_el.txt, text_el.x1, text_el.y1, text_el.x2, text_el.y2); 
+}
+
+
+
 function mouseInsideCanvas(){
     if(mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height ){
         return true;
@@ -124,6 +144,7 @@ function mouseInsideCanvas(){
 
 function newDrawing(data){
     shapes = data.shapes;
+    texto_tela = data.texto_tela;
     shapes.push(data.temp);
     drawShapes();
 }
@@ -131,6 +152,7 @@ function newDrawing(data){
 function limpaTela(){
     temp = [];
     shapes = [];
+    texto_tela = [];
     emitDrawing();
 }
 
@@ -156,12 +178,22 @@ function mouseReleased(){
             temp.push({ x: savedX, y: savedY, color: currentColor, sw: currStrokeWeight});
             temp.push({ x: mouseX, y: mouseY, color: currentColor, sw: currStrokeWeight});
             break;
+        case "texto":
+
+            texto_tela.push({txt: texto, x1: x1_text, y1: y1_text, x2: x2_text, y2: y2_text, color: currentColor});
+            //text(texto, x1_text,y1_text, x2_text, y2_text); 
+            //temp.push({ x1:x1_text, y1:y1_text, color: currentColor});
+            //
+            text_or_shape.push('t');
+            break;
         default:
             break;
     }
 
-    if(mouseInsideCanvas() || mouseLeftCanvas()){
+    //if(mouseInsideCanvas() || mouseLeftCanvas()){
+    if(mouseInsideCanvas()){
         shapes.push(temp);
+        text_or_shape.push('s');
     }
 
     temp = []
@@ -209,6 +241,7 @@ function mouseDragged(){
             background(255);
             drawShapes();
             noFill()
+            strokeWeight(currStrokeWeight);
             stroke(currentColor);
             rect(savedX, savedY, mouseX - savedX, mouseY - savedY);
             // apenas para visualização. armazenamento é feito no mouseReleased
@@ -218,6 +251,7 @@ function mouseDragged(){
             drawShapes();
             noFill()
             stroke(currentColor);
+            strokeWeight(currStrokeWeight);
             line(savedX, savedY, mouseX, mouseY);
             // apenas para visualização. armazenamento é feito no mouseReleased
             break;
@@ -227,12 +261,14 @@ function mouseDragged(){
             noFill();
             stroke(150);
             rect(x1_text, y1_text, mouseX - x1_text, mouseY - y1_text);
-            noStroke();
+            strokeWeight(1);
             x2_text = mouseX - x1_text;
             y2_text = mouseY - y1_text;
-            fill(0);
+            stroke(currentColor);
+            fill(currentColor);
             textSize(28);
             text(texto, x1_text,y1_text, x2_text, y2_text); 
+            strokeWeight(currStrokeWeight);
         default:
             break;
    }
@@ -245,13 +281,18 @@ function emitDrawing(){
 
    var data = {
        shapes: shapes,
-       temp: temp
+       temp: temp,
+       texto_tela: texto_tela
    }
    socket.emit('shapes', data);
 }
 
 function keyPressed(){
   if(keyCode == 32){
+      console.log(output.lastElementChild);
+      let img = new p5.Element(output);
+      //img.parent(canv);
+      img.position(width/2, height/2);
       undoDrawing();
   }
 }

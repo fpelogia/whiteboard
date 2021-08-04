@@ -6,11 +6,16 @@
     padding:10px;
 }
 .tool-bar{
-    width:1360px;
-    margin-left:10%;
+    width:200%;
+    margin-left:-50%;
     margin-bottom: 30px;
     text-align:center;
 }
+.frame{
+    max-width: 40em;
+    margin: auto;
+}
+
 label{
     width:100px;
     height:80px;
