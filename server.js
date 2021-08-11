@@ -2,6 +2,8 @@
  *Fontes: 
     [1] - https://youtu.be/2hhEOGXcCvg
  * */
+var cors = require('cors');
+
 var express = require('express');
 var app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,8 +13,10 @@ app.use(express.static('public'));
 
 console.log("Servidor rodando!");
 
+
 //var mj = require("mathjax");
 var socket = require("socket.io");
+
 var io = socket(server);
 
 io.sockets.on('connection', newConnection);

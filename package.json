@@ -16,6 +16,7 @@
   "author": "Frederico José Ribeiro Pelogia",
   "license": "GPLv3",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.17.1",
     "mathjax": "^3.1.4",
     "socket.io": "^4.1.1"
