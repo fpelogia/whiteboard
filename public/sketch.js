@@ -4,6 +4,7 @@ var fr = 60;
 var drawing = false;
 let temp = [];
 let temp_texto = [];
+let temp_eq = [];
 let shapes = [];
 let texto_tela = [];
 let text_or_shape = [];
@@ -30,11 +31,13 @@ var x2_text = 0;
 var y2_text = 0;
 var texto = "";
 var output;
+var there_is_temp_eq = false;
+var img;
 
 function setup(){
     canv = createCanvas(1360,768);
     canv.parent('canvasP5');
-    canv.style('margin-left', '-50%');
+    canv.style('margin', '0px');
     canv.style('border', '5px solid');
     //conexão com
     socket = io.connect('http://localhost:3000');
@@ -61,8 +64,12 @@ function setup(){
     strokeWeight(currStrokeWeight);
     background(255); // pinta o fundo de branco
 }
-
 function draw(){
+    if(there_is_temp_eq && mouseInsideCanvas()){
+        var imx = mouseX;
+        var imy = mouseY;
+        img.position(imx, imy);
+    }
     checkTools();
     lastMouseStatus = mouseInsideCanvas();
 }
@@ -186,6 +193,10 @@ function mouseReleased(){
             //
             text_or_shape.push('t');
             break;
+        case "latex":
+            img.style('border', 'none');
+            there_is_temp_eq = false;
+            break;
         default:
             break;
     }
@@ -289,10 +300,16 @@ function emitDrawing(){
 
 function keyPressed(){
   if(keyCode == 32){
-      console.log(output.lastElementChild);
-      let img = new p5.Element(output);
-      //img.parent(canv);
-      img.position(width/2, height/2);
-      undoDrawing();
+      if(ferramenta == "latex"){
+          img = new p5.Element(output);
+          console.log(img);
+          //img.parent(canv);
+          img.style('margin-left', '20%');
+          img.style('margin-top', '82px');
+          img.style('border', '1px solid grey');
+          img.position(0, 0);
+          //img.style('z-index', '-1');
+          there_is_temp_eq = true;
+      }
   }
 }

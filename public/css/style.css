@@ -1,5 +1,9 @@
+body{
+    margin-left:20%;
+    width:60%;
+}
 .title{
-    margin-left:25%;
+    /*margin-left:25%;*/
 }
 .tool-icon{
     font-size:36pt;
@@ -7,13 +11,13 @@
 }
 .tool-bar{
     width:200%;
-    margin-left:-50%;
+    /*margin-left:-50%;*/
     margin-bottom: 30px;
     text-align:center;
 }
 .frame{
     max-width: 40em;
-    margin: auto;
+  /*  margin: auto;*/
 }
 
 label{
