@@ -52,7 +52,7 @@ input:checked + label{
     border-color: #8f8f9d;
 }
 textarea{
-    width:1360px;
+    /*width:1360px;*/
     font-size:18pt;
     font-family:sans-serif;
 }

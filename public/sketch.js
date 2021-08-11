@@ -32,7 +32,9 @@ var y2_text = 0;
 var texto = "";
 var output;
 var there_is_temp_eq = false;
+var is_creating_text_box = 0;
 var img;
+var ct;
 
 function setup(){
     canv = createCanvas(1360,768);
@@ -57,14 +59,18 @@ function setup(){
     changeColor();
     //caixa de texto
     caixaTexto = select('#caixa_texto');
-    caixaTexto.input(atualizaTexto);
+    //caixaTexto.input(atualizaTexto);
 
     output = select('#output');
 
     strokeWeight(currStrokeWeight);
     background(255); // pinta o fundo de branco
+    ct = select('#caixa_texto');
+    //ct.style('width', '50px');
 }
 function draw(){
+    if(mouseInsideCanvas())
+        //ct.position(mouseX + 500, mouseY+100);
     if(there_is_temp_eq && mouseInsideCanvas()){
         var imx = mouseX;
         var imy = mouseY;
@@ -164,11 +170,11 @@ function limpaTela(){
 }
 
 function atualizaTexto() {
-  console.log(this.value());
+  //console.log(this.value());
   //background(200);
-  fill(0);
+  fill(currentColor);
   textSize(28);
-  texto = this.value()
+  texto = caixaTexto.value()
   text(texto, x1_text, y1_text, x2_text, y2_text); 
 }
 
@@ -187,11 +193,15 @@ function mouseReleased(){
             break;
         case "texto":
 
+            if(is_creating_text_box != 1){
+                break;
+            }
             texto_tela.push({txt: texto, x1: x1_text, y1: y1_text, x2: x2_text, y2: y2_text, color: currentColor});
             //text(texto, x1_text,y1_text, x2_text, y2_text); 
             //temp.push({ x1:x1_text, y1:y1_text, color: currentColor});
             //
             text_or_shape.push('t');
+            is_creating_text_box = 2;
             break;
         case "latex":
             img.style('border', 'none');
@@ -221,6 +231,10 @@ function mousePressed(){
     if(ferramenta == "texto"){
         x1_text = mouseX;
         y1_text = mouseY;
+        if(is_creating_text_box == 0){
+            //ct.style('display', 'block');
+            is_creating_text_box = 1;
+        }
     }
 }
 function mouseLeftCanvas(){
@@ -267,7 +281,10 @@ function mouseDragged(){
             // apenas para visualização. armazenamento é feito no mouseReleased
             break;
         case "texto":
-            background(255);
+            if(is_creating_text_box != 1){
+                break;
+            }
+            /*background(255);
             drawShapes();
             noFill();
             stroke(150);
@@ -280,6 +297,12 @@ function mouseDragged(){
             textSize(28);
             text(texto, x1_text,y1_text, x2_text, y2_text); 
             strokeWeight(currStrokeWeight);
+            */
+            ct.position(x1_text + 455, y1_text +87);
+            ct.style('width', mouseX - x1_text  + 'px');
+            ct.style('height', mouseY - (y1_text ) + 'px');
+            x2_text = mouseX;
+            y2_text = mouseY - y1_text;
         default:
             break;
    }
@@ -311,5 +334,15 @@ function keyPressed(){
           //img.style('z-index', '-1');
           there_is_temp_eq = true;
       }
+  }
+  if(keyCode == ENTER){
+    ct.style('display', 'none');
+    atualizaTexto();
+    texto_tela.push({txt: texto, x1: x1_text, y1: y1_text, x2: x2_text, y2: y2_text, color: currentColor});
+    //text(texto, x1_text,y1_text, x2_text, y2_text); 
+    //temp.push({ x1:x1_text, y1:y1_text, color: currentColor});
+    //
+    text_or_shape.push('t');
+    //is_creating_text_box = 0;
   }
 }
