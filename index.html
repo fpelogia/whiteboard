@@ -10,20 +10,8 @@
 
     <!-- Importa socket.io-->
     <script src="https://cdn.socket.io/4.0.2/socket.io.min.js" integrity="sha384-Bkt72xz1toXkj/oEiOgkQwWKbvNYxTNWMqdon3ejP6gwq53zSo48nW5xACmeDV0F" crossorigin="anonymous"></script>
-    <!-- Importa MathJax
-    <script type="text/javascript" id="MathJax-script" async
-      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
-    </script>
-    <script>
-    MathJax = {
-      tex: {
-        inlineMath: [['$', '$'], ['\\(', '\\)']]
-      }
-    };
-    </script>  -->
 
     <meta name="viewport" width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0>
-    <style> body {padding: 0; margin: 0;} </style>
     <script src="p5.js"></script>
     <!-- <script src="ship.js"></script> -->
     <!-- <script src="addons/p5.dom.min.js"></script>
@@ -34,9 +22,10 @@
         <style>
   #frame {
     max-width: 60em;
-    margin: auto;
+    /*margin: auto;*/
   }
-  #input {
+  #caixa_latex {
+    display: none;
     border: 1px solid grey;
     margin: 0 0 .25em;
     width: 100%;
@@ -45,11 +34,11 @@
   }
   #output {
     font-size: 160%;
-    margin-top: .75em;
+    /*margin-top: .75em;
     border: 1px solid grey;
     padding: .25em;
     min-height: 2em;
-    margin-bottom: 5em;
+    margin-bottom: 5em;*/
   }
   #output > pre {
     margin-left: 5px;
@@ -64,19 +53,19 @@
 
  
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
-  <script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script>
     function convert() {
       //
       //  Get the TeX input
       //
-      var input = document.getElementById("input").value.trim();
-      //
+      var input = document.getElementById("caixa_latex").value.trim();
+ //
       //  Disable the display and render buttons until MathJax is done
       //
       var display = document.getElementById("display");
       var button = document.getElementById("render");
-      button.disabled = display.disabled = true;
+      //button.disabled = display.disabled = true;
       //
       //  Clear the old output
       //
@@ -85,13 +74,13 @@
       //
       //  Reset the tex labels (and automatic equation numbers, though there aren't any here).
       //  Get the conversion options (metrics and display settings)
-      //  Convert the input to SVG output and use a promise to wait for it to be ready
+      //  Convert the input to CommonHTML output and use a promise to wait for it to be ready
       //    (in case an extension needs to be loaded dynamically).
       //
       MathJax.texReset();
       var options = MathJax.getMetricsFor(output);
-      options.display = display.checked;
-      MathJax.tex2svgPromise(input, options).then(function (node) {
+      //options.display = display.checked;
+      MathJax.tex2chtmlPromise(input, options).then(function (node) {
         //
         //  The promise returns the typeset node, which we add to the output
         //  Then update the document to include the adjusted CSS for the
@@ -109,7 +98,7 @@
         //
         //  Error or not, re-enable the display and render buttons
         //
-        button.disabled = display.disabled = false;
+        //button.disabled = display.disabled = false;
       });
     }
   </script>
@@ -119,39 +108,40 @@
     <body>
         <div class='frame'>
             <h1 class='title'>Colaborative Whiteboard with LaTeX support</h1>
+
             <div id="canvasP5">
                 <!-- Canvas -->
             </div>
             <br><tr>
             <div class='tool-bar'>    
                 <input type='radio' id='pincel' name = 'tool'  checked> 
-                <label for='pincel'>
+                <label class='chk-btn' for='pincel' >
                     <i class="fas fa-paint-brush tool-icon"></i>
                 </label>
 
                 <input type='radio' id='borracha' name = 'tool' > 
-                <label for='borracha'>
+                <label class='chk-btn' for='borracha'>
                     <i class="fas fa-eraser tool-icon"></i>
                 </label>
 
                 <input type='radio' id='retangulo' name = 'tool' > 
-                <label for='retangulo'>
+                <label class='chk-btn' for='retangulo'>
                     <i class="far fa-square tool-icon"></i>
                 </label>
 
                 <input type='radio' id='reta' name = 'tool' > 
-                <label for='reta'>
+                <label class='chk-btn' for='reta'>
                     <i class="fas fa-minus tool-icon"></i>
                 </label>
 
 
                 <input type='radio' id='texto' name = 'tool' > 
-                <label for='texto'>
+                <label class='chk-btn' for='texto'>
                     <i class="fas fa-i-cursor tool-icon"></i>
                 </label>
 
                 <input type='radio' id='latex' name = 'tool' > 
-                <label for='latex'>
+                <label class='chk-btn' for='latex'>
                     <i class="fas fa-square-root-alt tool-icon"></i>
                 </label>
 
@@ -165,31 +155,19 @@
                 </button>
             </div>
             <div class='tool-bar'>    
-                <input type="range" id="raio" name="vol" min="4" max="40">       
+                    Line thickness
+                <input type="range" id="raio" name="vol" min="4" max="48" step="4">       
             </div>
             <div class='tool-bar'>    
-                <textarea rows="5" id="caixa_texto" name="caixa_texto">
+                <textarea id="caixa_texto" name="caixa_texto" style="display:none">
                 </textarea>
             </div>
             </div>
         </div>
 <div id="frame">
 
-<h1>MathJax v3: TeX to SVG</h1>
-
-<textarea id="input" rows="15" cols="10">
-%
-% Enter TeX commands below
-%
-x = {-b \pm \sqrt{b^2-4ac} \over 2a}.
+    <textarea id="caixa_latex" rows="15" cols="10" placeholder="% TeX">
 </textarea>
-<br />
-<div class="left">
-<input type="checkbox" id="display" checked onchange="convert()"> <label for="display">Display style</label>
-</div>
-<div class="right">
-<input type="button" value="Render TeX" id="render" style="font-size:24pt" onclick="convert()" />
-</div>
 <br clear="all" />
 <div id="output"></div>
 

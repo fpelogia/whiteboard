@@ -1,5 +1,9 @@
+body{
+    margin-left:20%;
+    width:60%;
+}
 .title{
-    margin-left:25%;
+    /*margin-left:25%;*/
 }
 .tool-icon{
     font-size:36pt;
@@ -7,16 +11,16 @@
 }
 .tool-bar{
     width:200%;
-    margin-left:-50%;
+    /*margin-left:-50%;*/
     margin-bottom: 30px;
     text-align:center;
 }
 .frame{
     max-width: 40em;
-    margin: auto;
+  /*  margin: auto;*/
 }
 
-label{
+.chk-btn{
     width:100px;
     height:80px;
     display:inline-block;
@@ -48,9 +52,10 @@ input:checked + label{
     border-color: #8f8f9d;
 }
 textarea{
-    width:1360px;
+    /*width:1360px;*/
     font-size:18pt;
     font-family:sans-serif;
+    text-align:left;
 }
 
 /* RANGE*/
