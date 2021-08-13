@@ -89,6 +89,9 @@ function checkTools(){
         btn = select("#"+tools[i]);
         //console.log("ferramenta", tools[i] , " : ", btn.elt.checked);
         if(btn.elt.checked){
+            if(ferramenta != tools[i] && is_creating_text_box == 2){
+                confirmaTexto();
+            }
             ferramenta = tools[i];
         }
     }
@@ -183,6 +186,15 @@ function atualizaTexto() {
   textSize(28);
   texto = caixaTexto.value()
   //text(texto, x1_text, y1_text, x2_text, y2_text); 
+}
+
+function confirmaTexto(){
+    ct.style('display', 'none');
+    atualizaTexto();
+    texto_tela.push({txt: texto, x1: x1_text, y1: y1_text, x2: x2_text, y2: y2_text, color: currentColor});
+    text_or_shape.push('t');
+    is_creating_text_box = 0;
+    drawShapes();
 }
 
 function mouseReleased(){
@@ -344,12 +356,7 @@ function keyPressed(){
       }
   }
   if(keyCode == ENTER){
-
-    ct.style('display', 'none');
-    atualizaTexto();
-    texto_tela.push({txt: texto, x1: x1_text, y1: y1_text, x2: x2_text, y2: y2_text, color: currentColor});
-    text_or_shape.push('t');
-    is_creating_text_box = 0;
-    drawShapes();
+    confirmaTexto();
   }
 }
+
