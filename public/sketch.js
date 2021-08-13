@@ -24,6 +24,7 @@ var savedX;
 var savedY;
 var seletorCor;
 var caixaTexto;
+var caixaLaTeX;
 var currentColor;
 var x1_text = 0;
 var y1_text = 0;
@@ -59,21 +60,17 @@ function setup(){
     changeColor();
     //caixa de texto
     caixaTexto = select('#caixa_texto');
+    //caixa para inserção dos comandos LaTeX
+    caixaLaTeX = select('#caixa_latex');
     //caixaTexto.input(atualizaTexto);
 
     output = select('#output');
 
     strokeWeight(currStrokeWeight);
     background(255); // pinta o fundo de branco
-    ct = select('#caixa_texto');
-    //ct.style('width', '50px');
 }
 function draw(){
 
-    if(mouseInsideCanvas()){
-        console.log("ictb: ", is_creating_text_box);
-    }
-        //ct.position(mouseX + 500, mouseY+100);
     if(there_is_temp_eq && mouseInsideCanvas()){
         var imx = mouseX;
         var imy = mouseY;
@@ -138,8 +135,6 @@ function drawShapes(){
 }
 
 function escreveTextos(){
-    //background(255);
-    console.log("Escrevendo texto");
     for (let i = 0; i < texto_tela.length; i++){
         escreveTexto(texto_tela[i]);
     }
@@ -189,12 +184,26 @@ function atualizaTexto() {
 }
 
 function confirmaTexto(){
-    ct.style('display', 'none');
-    atualizaTexto();
-    texto_tela.push({txt: texto, x1: x1_text, y1: y1_text, x2: x2_text, y2: y2_text, color: currentColor});
-    text_or_shape.push('t');
-    is_creating_text_box = 0;
-    drawShapes();
+    if(ferramenta == 'latex'){
+        caixaLaTeX.style('display', 'none');
+        convert();
+        img = new p5.Element(output);
+        console.log(output);
+        img.style('margin-left', '20%');
+        img.style('margin-top', '82px');
+        img.style('border', '1px solid grey');
+        img.position(0, 0);
+        //img.style('z-index', '-1');
+        there_is_temp_eq = true;
+        is_creating_text_box = 3;
+    }else{
+        caixaTexto.style('display', 'none');
+        atualizaTexto();
+        texto_tela.push({txt: texto, x1: x1_text, y1: y1_text, x2: x2_text, y2: y2_text, color: currentColor});
+        text_or_shape.push('t');
+        is_creating_text_box = 0;
+        drawShapes();
+    }
 }
 
 function mouseReleased(){
@@ -212,20 +221,20 @@ function mouseReleased(){
             break;
         case "texto":
             if(is_creating_text_box != 1){
-                //console.log("didn't push text");
                 break;
             }
-            //console.log("pushed text");
-            //texto_tela.push({txt: texto, x1: x1_text, y1: y1_text, x2: x2_text, y2: y2_text, color: currentColor});
-            //text(texto, x1_text,y1_text, x2_text, y2_text); 
-            //temp.push({ x1:x1_text, y1:y1_text, color: currentColor});
-            //
-            //text_or_shape.push('t');
             is_creating_text_box = 2;
             break;
         case "latex":
-            img.style('border', 'none');
+            if(is_creating_text_box == 3){
+                img.style('border', 'none');
+                is_creating_text_box = 0;
+            }
             there_is_temp_eq = false;
+            if(is_creating_text_box != 1){
+                break;
+            }
+            is_creating_text_box = 2;
             break;
         default:
             break;
@@ -252,7 +261,15 @@ function mousePressed(){
         x1_text = mouseX;
         y1_text = mouseY;
         if(is_creating_text_box == 0){
-            ct.style('display', 'block');
+            caixaTexto.style('display', 'block');
+            is_creating_text_box = 1;
+        }
+    }
+    if(ferramenta == "latex" && mouseInsideCanvas() && is_creating_text_box < 2){
+        x1_text = mouseX;
+        y1_text = mouseY;
+        if(is_creating_text_box == 0){
+            caixaLaTeX.style('display', 'block');
             is_creating_text_box = 1;
         }
     }
@@ -304,25 +321,22 @@ function mouseDragged(){
             if(is_creating_text_box != 1){
                 break;
             }
-            /*background(255);
-            drawShapes();
-            noFill();
-            stroke(150);
-            rect(x1_text, y1_text, mouseX - x1_text, mouseY - y1_text);
-            strokeWeight(1);
-            x2_text = mouseX - x1_text;
-            y2_text = mouseY - y1_text;
-            stroke(currentColor);
-            fill(currentColor);
-            textSize(28);
-            text(texto, x1_text,y1_text, x2_text, y2_text); 
-            strokeWeight(currStrokeWeight);
-            */
-            ct.position(x1_text + 455, y1_text +87);
-            ct.style('width', mouseX - x1_text  + 'px');
-            ct.style('height', mouseY - (y1_text ) + 'px');
+            caixaTexto.position(x1_text + 455, y1_text +87);
+            caixaTexto.style('width', mouseX - x1_text  + 'px');
+            caixaTexto.style('height', mouseY - (y1_text ) + 'px');
             x2_text = mouseX;
             y2_text = mouseY - y1_text;
+            break;
+        case "latex":
+            if(is_creating_text_box != 1){
+                break;
+            }
+            caixaLaTeX.position(x1_text + 455, y1_text +87);
+            caixaLaTeX.style('width', mouseX - x1_text  + 'px');
+            caixaLaTeX.style('height', mouseY - (y1_text ) + 'px');
+            x2_text = mouseX;
+            y2_text = mouseY - y1_text;
+            break;
         default:
             break;
    }
@@ -354,6 +368,9 @@ function keyPressed(){
           //img.style('z-index', '-1');
           there_is_temp_eq = true;
       }
+  }
+  if(keyCode == 113){//<F2>
+    saveCanvas(canv, 'myCanvas', 'jpg');
   }
   if(keyCode == ENTER){
     confirmaTexto();
