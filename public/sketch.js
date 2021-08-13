@@ -69,7 +69,10 @@ function setup(){
     //ct.style('width', '50px');
 }
 function draw(){
-    if(mouseInsideCanvas())
+
+    if(mouseInsideCanvas()){
+        console.log("ictb: ", is_creating_text_box);
+    }
         //ct.position(mouseX + 500, mouseY+100);
     if(there_is_temp_eq && mouseInsideCanvas()){
         var imx = mouseX;
@@ -133,13 +136,15 @@ function drawShapes(){
 
 function escreveTextos(){
     //background(255);
-    noFill();
+    console.log("Escrevendo texto");
     for (let i = 0; i < texto_tela.length; i++){
         escreveTexto(texto_tela[i]);
     }
 }
 function escreveTexto(text_el){
-    stroke(text_el.color);
+    textAlign(LEFT, TOP);
+    //stroke(text_el.color);
+    noStroke();
     fill(text_el.color);
     textSize(28);
     text(text_el.txt, text_el.x1, text_el.y1, text_el.x2, text_el.y2); 
@@ -172,10 +177,12 @@ function limpaTela(){
 function atualizaTexto() {
   //console.log(this.value());
   //background(200);
+    //
+  textAlign(LEFT, TOP);
   fill(currentColor);
   textSize(28);
   texto = caixaTexto.value()
-  text(texto, x1_text, y1_text, x2_text, y2_text); 
+  //text(texto, x1_text, y1_text, x2_text, y2_text); 
 }
 
 function mouseReleased(){
@@ -192,15 +199,16 @@ function mouseReleased(){
             temp.push({ x: mouseX, y: mouseY, color: currentColor, sw: currStrokeWeight});
             break;
         case "texto":
-
             if(is_creating_text_box != 1){
+                //console.log("didn't push text");
                 break;
             }
-            texto_tela.push({txt: texto, x1: x1_text, y1: y1_text, x2: x2_text, y2: y2_text, color: currentColor});
+            //console.log("pushed text");
+            //texto_tela.push({txt: texto, x1: x1_text, y1: y1_text, x2: x2_text, y2: y2_text, color: currentColor});
             //text(texto, x1_text,y1_text, x2_text, y2_text); 
             //temp.push({ x1:x1_text, y1:y1_text, color: currentColor});
             //
-            text_or_shape.push('t');
+            //text_or_shape.push('t');
             is_creating_text_box = 2;
             break;
         case "latex":
@@ -228,11 +236,11 @@ function mousePressed(){
         savedX = mouseX;
         savedY = mouseY;
     }
-    if(ferramenta == "texto"){
+    if(ferramenta == "texto" && mouseInsideCanvas() && is_creating_text_box != 2){
         x1_text = mouseX;
         y1_text = mouseY;
         if(is_creating_text_box == 0){
-            //ct.style('display', 'block');
+            ct.style('display', 'block');
             is_creating_text_box = 1;
         }
     }
@@ -336,13 +344,12 @@ function keyPressed(){
       }
   }
   if(keyCode == ENTER){
+
     ct.style('display', 'none');
     atualizaTexto();
     texto_tela.push({txt: texto, x1: x1_text, y1: y1_text, x2: x2_text, y2: y2_text, color: currentColor});
-    //text(texto, x1_text,y1_text, x2_text, y2_text); 
-    //temp.push({ x1:x1_text, y1:y1_text, color: currentColor});
-    //
     text_or_shape.push('t');
-    //is_creating_text_box = 0;
+    is_creating_text_box = 0;
+    drawShapes();
   }
 }
