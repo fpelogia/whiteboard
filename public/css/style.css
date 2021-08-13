@@ -20,7 +20,7 @@ body{
   /*  margin: auto;*/
 }
 
-label{
+.chk-btn{
     width:100px;
     height:80px;
     display:inline-block;
