@@ -39,6 +39,10 @@ var img;
 var eq;
 var lista_eqs = [];
 var lista_circ = [];
+var rec_lista_eqs = [];
+var last_latex_cmd;
+var imx;
+var imy;
 
 function setup(){
     canv = createCanvas(1360,768);
@@ -47,7 +51,8 @@ function setup(){
     canv.style('border', '5px solid');
     //conexão com
     socket = io.connect('http://localhost:3000');
-    socket.on('shapes', newDrawing); 
+    socket.on('data', newDrawing); 
+    socket.on('equation', newEquation); 
     //botão de limpar tela
     limparBtn = select("#limpar");
     limparBtn.mousePressed(limpaTela);
@@ -75,8 +80,8 @@ function setup(){
 function draw(){
 
     if(there_is_temp_eq && mouseInsideCanvas()){
-        var imx = mouseX;
-        var imy = mouseY;
+        imx = mouseX;
+        imy = mouseY;
         eq.position(imx, imy);
     }
     checkTools();
@@ -176,7 +181,7 @@ function escreveTexto(text_el){
     //stroke(text_el.color);
     noStroke();
     fill(text_el.color);
-    textSize(28);
+    textSize(36);
     text(text_el.txt, text_el.x1, text_el.y1, text_el.x2, text_el.y2); 
 }
 
@@ -191,10 +196,53 @@ function mouseInsideCanvas(){
 }
 
 function newDrawing(data){
-    shapes = data.shapes;
     texto_tela = data.texto_tela;
+    lista_circ = data.lista_circ;
+    shapes = data.shapes;
     shapes.push(data.temp);
     drawShapes();
+}
+
+function newEquation(data){
+
+    var input = data.cmd;
+    eq = createSpan("");
+    eq.parent('canvasP5');
+    eq.style('margin-left', '500px');
+    //eq.style('z-index', '-1');
+    eq.style('margin-top', '120px');
+    eq.position(0, 0);
+    eq.style("font-size","160%");
+    MathJax.texReset();
+    var opts = MathJax.getMetricsFor(eq.elt);
+    last_latex_cmd = input;
+    MathJax.tex2svgPromise(input, opts).then(function (node) {
+      //
+      //  The promise returns the typeset node, which we add to the output
+      //  Then update the document to include the adjusted CSS for the
+      //    content of the new equation.
+      //
+      eq.elt.appendChild(node);
+      MathJax.startup.document.clear();
+      MathJax.startup.document.updateDocument();
+    }).catch(function (err) {
+      //
+      //  If there was an error, put the message into the output instead
+      //
+      eq.elt.appendChild(document.createElement('pre')).appendChild(document.createTextNode(err.message));
+    }).then(function () {
+      //
+      //  Error or not, re-enable the display and render buttons
+      //
+      //button.disabled = display.disabled = false;
+    });
+    //var input = document.getElementById("caixa_latex").value.trim();
+    //img.style('z-index', '-1');
+    //
+
+    eq.position(data.x, data.y);
+    lista_eqs.push(eq);
+    type_of_object.push('e');
 }
 
 function limpaTela(){
@@ -210,19 +258,18 @@ function atualizaTexto() {
     //
   textAlign(LEFT, TOP);
   fill(currentColor);
-  textSize(28);
+  textSize(36);
   texto = caixaTexto.value()
   //text(texto, x1_text, y1_text, x2_text, y2_text); 
 }
 
-let ccc;
 function confirmaTexto(){
     if(ferramenta == 'latex'){
         caixaLaTeX.style('display', 'none');
-        //convert();
-        //img = new p5.Element(output);
-        eq = createDiv("");
+        eq = createSpan("");
+        eq.parent('canvasP5');
         eq.style('margin-left', '500px');
+        //eq.style('z-index', '-1');
         eq.style('margin-top', '120px');
         eq.style('border', '1px solid grey');
         eq.position(0, 0);
@@ -230,7 +277,8 @@ function confirmaTexto(){
         MathJax.texReset();
         var input = caixaLaTeX.elt.value.trim();
         var opts = MathJax.getMetricsFor(eq.elt);
-        MathJax.tex2chtmlPromise(input, opts).then(function (node) {
+        last_latex_cmd = input;
+        MathJax.tex2svgPromise(input, opts).then(function (node) {
           //
           //  The promise returns the typeset node, which we add to the output
           //  Then update the document to include the adjusted CSS for the
@@ -251,13 +299,6 @@ function confirmaTexto(){
           //button.disabled = display.disabled = false;
         });
         //var input = document.getElementById("caixa_latex").value.trim();
-        //console.log(output);
-        //copyof = output.childNodes[0];
-        //document.body.appendChild(output); 
-        /*img.style('margin-left', '20%');
-        img.style('margin-top', '82px');
-        img.style('border', '1px solid grey');
-        img.position(0, 0);*/
         //img.style('z-index', '-1');
         there_is_temp_eq = true;
         is_creating_text_box = 3;
@@ -309,6 +350,7 @@ function mouseReleased(){
                 is_creating_text_box = 0;
                 lista_eqs.push(eq);
                 type_of_object.push('e');
+                emitEquation();
             }
             there_is_temp_eq = false;
             if(is_creating_text_box != 1){
@@ -330,7 +372,6 @@ function mouseReleased(){
     temp = []
     background(255);
     drawShapes();
-
     emitDrawing();
 }
 function mousePressed(){
@@ -445,14 +486,27 @@ function emitDrawing(){
    var data = {
        shapes: shapes,
        temp: temp,
-       texto_tela: texto_tela
+       texto_tela: texto_tela,
+       lista_circ: lista_circ
    }
-   socket.emit('shapes', data);
+   socket.emit('data', data);
 }
+
+function emitEquation(){
+
+   var data = {
+       cmd: last_latex_cmd,
+       x: imx,
+       y: imy
+   }
+   socket.emit('equation', data);
+}
+
 
 function keyPressed(){
   if(keyCode == ENTER){
     confirmaTexto();
+    emitDrawing();
   }
 }
 

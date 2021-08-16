@@ -16,12 +16,20 @@ io.sockets.on('connection', newConnection);
 
 function newConnection(socket){
     console.log('New connection:' + socket.id);
-    socket.on('shapes', shapesMsg);
+    socket.on('data', dataMsg);
+    socket.on('equation', eqMsg);
 
-    function shapesMsg(data){
-        socket.broadcast.emit('shapes', data);
+    function dataMsg(data){
+        socket.broadcast.emit('data', data);
         //caso precise mandar para o cliente que enviou tbm, usar:
-        // io.sockets.emit('shapes', data);
+        // io.sockets.emit('data', data);
+        console.log(data);
+    }
+
+    function eqMsg(data){
+        socket.broadcast.emit('equation', data);
+        //caso precise mandar para o cliente que enviou tbm, usar:
+        // io.sockets.emit('equation', data);
         console.log(data);
     }
 }

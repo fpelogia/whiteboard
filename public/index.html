@@ -13,97 +13,11 @@
 
     <meta name="viewport" width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0>
     <script src="p5.js"></script>
-    <!-- <script src="ship.js"></script> -->
-    <!-- <script src="addons/p5.dom.min.js"></script>
-    <script src="addons/p5.sound.min.js"></script> -->
-    <!-- <script src="https://unpkg.com/ml5@0.1.1/dist/ml5.min.js"></script> -->
     <script src="sketch.js"></script>
     <!-- <meta name="viewport" content="user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1,width=device-width"> -->
-        <style>
-  #frame {
-    max-width: 60em;
-    /*margin: auto;*/
-  }
-  #caixa_latex {
-    display: none;
-    border: 1px solid grey;
-    margin: 0 0 .25em;
-    width: 100%;
-    font-size: 160%;
-    box-sizing: border-box;
-  }
-  #output {
-    font-size: 160%;
-    /*margin-top: .75em;
-    border: 1px solid grey;
-    padding: .25em;
-    min-height: 2em;
-    margin-bottom: 5em;*/
-  }
-  #output > pre {
-    margin-left: 5px;
-  }
-  .left {
-    float: left;
-  }
-  .right {
-    float: right;
-  }
-  </style>
-
  
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-<script>
-    function convert() {
-      //
-      //  Get the TeX input
-      //
-      var input = document.getElementById("caixa_latex").value.trim();
- //
-      //  Disable the display and render buttons until MathJax is done
-      //
-      var display = document.getElementById("display");
-      var button = document.getElementById("render");
-      //button.disabled = display.disabled = true;
-      //
-      //  Clear the old output
-      //
-      output = document.getElementById('output');
-      output.innerHTML = '';
-      //
-      //  Reset the tex labels (and automatic equation numbers, though there aren't any here).
-      //  Get the conversion options (metrics and display settings)
-      //  Convert the input to CommonHTML output and use a promise to wait for it to be ready
-      //    (in case an extension needs to be loaded dynamically).
-      //
-      MathJax.texReset();
-      var options = MathJax.getMetricsFor(output);
-      //options.display = display.checked;
-      MathJax.tex2chtmlPromise(input, options).then(function (node) {
-        //
-        //  The promise returns the typeset node, which we add to the output
-        //  Then update the document to include the adjusted CSS for the
-        //    content of the new equation.
-        //
-        output.appendChild(node);
-        MathJax.startup.document.clear();
-        MathJax.startup.document.updateDocument();
-      }).catch(function (err) {
-        //
-        //  If there was an error, put the message into the output instead
-        //
-        output.appendChild(document.createElement('pre')).appendChild(document.createTextNode(err.message));
-      }).then(function () {
-        //
-        //  Error or not, re-enable the display and render buttons
-        //
-        //button.disabled = display.disabled = false;
-      });
-    }
-  </script>
-
-
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
     </head>
     <body>
         <div class='frame'>
@@ -170,7 +84,7 @@
         </div>
 <div id="frame">
 
-    <textarea id="caixa_latex" rows="15" cols="10" placeholder="% TeX">
+    <textarea id="caixa_latex" rows="15" cols="10" placeholder="% TeX" style="display:none">
 </textarea>
 <br clear="all" />
 <div id="output"></div>
