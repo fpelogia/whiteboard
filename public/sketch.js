@@ -35,7 +35,7 @@ var output;
 var there_is_temp_eq = false;
 var is_creating_text_box = 0;
 var img;
-var ct;
+var eq;
 
 function setup(){
     canv = createCanvas(1360,768);
@@ -74,7 +74,7 @@ function draw(){
     if(there_is_temp_eq && mouseInsideCanvas()){
         var imx = mouseX;
         var imy = mouseY;
-        img.position(imx, imy);
+        eq.position(imx, imy);
     }
     checkTools();
     lastMouseStatus = mouseInsideCanvas();
@@ -86,8 +86,16 @@ function checkTools(){
         btn = select("#"+tools[i]);
         //console.log("ferramenta", tools[i] , " : ", btn.elt.checked);
         if(btn.elt.checked){
-            if(ferramenta != tools[i] && is_creating_text_box == 2){
-                confirmaTexto();
+            if(ferramenta != tools[i] && is_creating_text_box >= 2){
+                switch(is_creating_text_box){
+                    case 2:
+                        confirmaTexto();
+                        break;
+                    case 3:
+                        eq.elt.remove();
+                        is_creating_text_box = 0;
+                        break;
+                }
             }
             ferramenta = tools[i];
         }
@@ -183,16 +191,49 @@ function atualizaTexto() {
   //text(texto, x1_text, y1_text, x2_text, y2_text); 
 }
 
+let ccc;
 function confirmaTexto(){
     if(ferramenta == 'latex'){
         caixaLaTeX.style('display', 'none');
-        convert();
-        img = new p5.Element(output);
-        console.log(output);
-        img.style('margin-left', '20%');
+        //convert();
+        //img = new p5.Element(output);
+        eq = createDiv("");
+        eq.style('margin-left', '20%');
+        eq.style('margin-top', '82px');
+        eq.style('border', '1px solid grey');
+        eq.position(0, 0);
+        eq.style("font-size","160%");
+        MathJax.texReset();
+        var input = caixaLaTeX.elt.value.trim();
+        var opts = MathJax.getMetricsFor(eq.elt);
+        MathJax.tex2chtmlPromise(input, opts).then(function (node) {
+          //
+          //  The promise returns the typeset node, which we add to the output
+          //  Then update the document to include the adjusted CSS for the
+          //    content of the new equation.
+          //
+          eq.elt.appendChild(node);
+          MathJax.startup.document.clear();
+          MathJax.startup.document.updateDocument();
+        }).catch(function (err) {
+          //
+          //  If there was an error, put the message into the output instead
+          //
+          eq.elt.appendChild(document.createElement('pre')).appendChild(document.createTextNode(err.message));
+        }).then(function () {
+          //
+          //  Error or not, re-enable the display and render buttons
+          //
+          //button.disabled = display.disabled = false;
+        });
+        //var input = document.getElementById("caixa_latex").value.trim();
+        //console.log(output);
+        //copyof = output.childNodes[0];
+        //document.body.appendChild(output); 
+        /*img.style('margin-left', '20%');
         img.style('margin-top', '82px');
         img.style('border', '1px solid grey');
-        img.position(0, 0);
+        img.position(0, 0);*/
         //img.style('z-index', '-1');
         there_is_temp_eq = true;
         is_creating_text_box = 3;
@@ -226,8 +267,10 @@ function mouseReleased(){
             is_creating_text_box = 2;
             break;
         case "latex":
+            if(mouseInsideCanvas() == 0) 
+                break;
             if(is_creating_text_box == 3){
-                img.style('border', 'none');
+                eq.style('border', 'none');
                 is_creating_text_box = 0;
             }
             there_is_temp_eq = false;
@@ -356,7 +399,7 @@ function emitDrawing(){
 }
 
 function keyPressed(){
-  if(keyCode == 32){
+  /*if(keyCode == 32){
       if(ferramenta == "latex"){
           img = new p5.Element(output);
           console.log(img);
@@ -368,9 +411,11 @@ function keyPressed(){
           //img.style('z-index', '-1');
           there_is_temp_eq = true;
       }
-  }
+  }*/
   if(keyCode == 113){//<F2>
-    saveCanvas(canv, 'myCanvas', 'jpg');
+
+    eq = createSpan(output.firstElementChild.innerHTML);
+    //saveCanvas(canv, 'myCanvas', 'jpg');
   }
   if(keyCode == ENTER){
     confirmaTexto();
