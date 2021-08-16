@@ -7,7 +7,7 @@ let temp_texto = [];
 let temp_eq = [];
 let shapes = [];
 let texto_tela = [];
-let text_or_shape = [];
+let type_of_object = [];
 var lastMouseStatus;
 var tools = ["pincel",
              "borracha",
@@ -103,15 +103,15 @@ function checkTools(){
     }
 }
 function undoDrawing(){
-    var ch = text_or_shape.pop();
+    var ch = type_of_object.pop();
     if(ch == 't'){
-        console.log("Remover texto");
+        console.log("Text removed");
         texto_tela.pop();
     }else if(ch == 's'){
-        console.log("Remover shape");
+        console.log("Shape removed");
         shapes.pop();
     }else if(ch == 'e'){
-        console.log("Remover equacao");
+        console.log("Equation removed")
         var ult_eq = lista_eqs.pop();
         ult_eq.elt.remove();
     }
@@ -248,7 +248,7 @@ function confirmaTexto(){
         caixaTexto.style('display', 'none');
         atualizaTexto();
         texto_tela.push({txt: texto, x1: x1_text, y1: y1_text, x2: x2_text, y2: y2_text, color: currentColor});
-        text_or_shape.push('t');
+        type_of_object.push('t');
         is_creating_text_box = 0;
         drawShapes();
     }
@@ -280,7 +280,7 @@ function mouseReleased(){
                 eq.style('border', 'none');
                 is_creating_text_box = 0;
                 lista_eqs.push(eq);
-                text_or_shape.push('e');
+                type_of_object.push('e');
             }
             there_is_temp_eq = false;
             if(is_creating_text_box != 1){
@@ -296,7 +296,7 @@ function mouseReleased(){
     if(mouseInsideCanvas() && ferramenta != "latex" && ferramenta != "texto"){
         shapes.push(temp);
         console.log("opa... novo shape : ", ferramenta);
-        text_or_shape.push('s');
+        type_of_object.push('s');
     }
 
     temp = []
