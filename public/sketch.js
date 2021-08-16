@@ -36,6 +36,7 @@ var there_is_temp_eq = false;
 var is_creating_text_box = 0;
 var img;
 var eq;
+var lista_eqs = [];
 
 function setup(){
     canv = createCanvas(1360,768);
@@ -104,9 +105,15 @@ function checkTools(){
 function undoDrawing(){
     var ch = text_or_shape.pop();
     if(ch == 't'){
+        console.log("Remover texto");
         texto_tela.pop();
     }else if(ch == 's'){
+        console.log("Remover shape");
         shapes.pop();
+    }else if(ch == 'e'){
+        console.log("Remover equacao");
+        var ult_eq = lista_eqs.pop();
+        ult_eq.elt.remove();
     }
     emitDrawing();
 }
@@ -272,6 +279,8 @@ function mouseReleased(){
             if(is_creating_text_box == 3){
                 eq.style('border', 'none');
                 is_creating_text_box = 0;
+                lista_eqs.push(eq);
+                text_or_shape.push('e');
             }
             there_is_temp_eq = false;
             if(is_creating_text_box != 1){
@@ -284,8 +293,9 @@ function mouseReleased(){
     }
 
     //if(mouseInsideCanvas() || mouseLeftCanvas()){
-    if(mouseInsideCanvas()){
+    if(mouseInsideCanvas() && ferramenta != "latex" && ferramenta != "texto"){
         shapes.push(temp);
+        console.log("opa... novo shape : ", ferramenta);
         text_or_shape.push('s');
     }
 
