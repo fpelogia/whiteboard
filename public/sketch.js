@@ -13,6 +13,7 @@ var tools = ["pincel",
              "borracha",
              "reta",
              "retangulo",
+             "circulo",
              "texto",
              "latex",
 ];
@@ -37,6 +38,7 @@ var is_creating_text_box = 0;
 var img;
 var eq;
 var lista_eqs = [];
+var lista_circ = [];
 
 function setup(){
     canv = createCanvas(1360,768);
@@ -114,6 +116,9 @@ function undoDrawing(){
         console.log("Equation removed")
         var ult_eq = lista_eqs.pop();
         ult_eq.elt.remove();
+    }else if(ch == 'c'){
+        console.log("circle removed")
+        lista_circ.pop();
     }
     emitDrawing();
 }
@@ -140,12 +145,25 @@ function drawShape(shlist){
 }
 function drawShapes(){
     background(255);
+    desenhaCirculos();
+    strokeWeight(1);
+    escreveTextos();
     noFill();
     for (let i = 0; i < shapes.length; i++){
         drawShape(shapes[i]);
     }
-    strokeWeight(1);
-    escreveTextos();
+}
+function desenhaCirculos(){
+    for (let i = 0; i < lista_circ.length; i++){
+        desenhaCirculo(lista_circ[i]);
+    }
+}
+
+function desenhaCirculo(c){
+    noFill();
+    strokeWeight(currStrokeWeight);
+    stroke(currentColor);
+    circle(c.cx, c.cy, c.r);        
 }
 
 function escreveTextos(){
@@ -262,6 +280,15 @@ function mouseReleased(){
             temp.push({ x: mouseX, y: savedY, color: currentColor, sw: currStrokeWeight});
             temp.push({ x: savedX, y: savedY, color: currentColor, sw: currStrokeWeight});
             break;
+        case "circulo":
+            if(!mouseInsideCanvas()) break;
+            lista_circ.push({ 
+                cx: savedX, 
+                cy: savedY, 
+                r:sqrt((mouseX - savedX)**2 + (mouseY - savedY)**2)
+            });             
+            type_of_object.push('c');
+            break;
         case "reta":
             temp.push({ x: savedX, y: savedY, color: currentColor, sw: currStrokeWeight});
             temp.push({ x: mouseX, y: mouseY, color: currentColor, sw: currStrokeWeight});
@@ -292,7 +319,7 @@ function mouseReleased(){
     }
 
     //if(mouseInsideCanvas() || mouseLeftCanvas()){
-    if(mouseInsideCanvas() && ferramenta != "latex" && ferramenta != "texto"){
+    if(mouseInsideCanvas() && ferramenta != "latex" && ferramenta != "texto" && ferramenta != "circulo" ){
         shapes.push(temp);
         console.log("opa... novo shape : ", ferramenta);
         type_of_object.push('s');
@@ -305,7 +332,7 @@ function mouseReleased(){
     emitDrawing();
 }
 function mousePressed(){
-    if(ferramenta == "retangulo" || ferramenta == "reta"){
+    if(ferramenta == "retangulo" || ferramenta == "reta" || ferramenta == "circulo"){
         savedX = mouseX;
         savedY = mouseY;
     }
@@ -358,6 +385,15 @@ function mouseDragged(){
             strokeWeight(currStrokeWeight);
             stroke(currentColor);
             rect(savedX, savedY, mouseX - savedX, mouseY - savedY);
+            // apenas para visualização. armazenamento é feito no mouseReleased
+            break;
+        case "circulo":
+            background(255);
+            drawShapes();
+            noFill()
+            strokeWeight(currStrokeWeight);
+            stroke(currentColor);
+            circle(savedX,savedY,sqrt((mouseX - savedX)**2 + (mouseY - savedY)**2));             
             // apenas para visualização. armazenamento é feito no mouseReleased
             break;
         case "reta":
@@ -413,24 +449,6 @@ function emitDrawing(){
 }
 
 function keyPressed(){
-  /*if(keyCode == 32){
-      if(ferramenta == "latex"){
-          img = new p5.Element(output);
-          console.log(img);
-          //img.parent(canv);
-          img.style('margin-left', '20%');
-          img.style('margin-top', '82px');
-          img.style('border', '1px solid grey');
-          img.position(0, 0);
-          //img.style('z-index', '-1');
-          there_is_temp_eq = true;
-      }
-  }*/
-  if(keyCode == 113){//<F2>
-
-    eq = createSpan(output.firstElementChild.innerHTML);
-    //saveCanvas(canv, 'myCanvas', 'jpg');
-  }
   if(keyCode == ENTER){
     confirmaTexto();
   }
