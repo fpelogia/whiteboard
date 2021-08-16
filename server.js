@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3000;
 
 var server = app.listen(PORT, () => console.log(`Server is listening on port ${PORT}...`));
 
-app.use(express.static('public'));
+app.use(express.static('.'));
 console.log("Servidor rodando!");
 
 //var mj = require("mathjax");
