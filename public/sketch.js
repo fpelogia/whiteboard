@@ -161,8 +161,8 @@ function desenhaCirculos(){
 
 function desenhaCirculo(c){
     noFill();
-    strokeWeight(currStrokeWeight);
-    stroke(currentColor);
+    strokeWeight(c.sw);
+    stroke(c.color);
     circle(c.cx, c.cy, c.r);        
 }
 
@@ -285,7 +285,9 @@ function mouseReleased(){
             lista_circ.push({ 
                 cx: savedX, 
                 cy: savedY, 
-                r:sqrt((mouseX - savedX)**2 + (mouseY - savedY)**2)
+                r:sqrt((mouseX - savedX)**2 + (mouseY - savedY)**2),
+                color:currentColor,
+                sw: currStrokeWeight
             });             
             type_of_object.push('c');
             break;
