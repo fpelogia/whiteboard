@@ -249,6 +249,11 @@ function limpaTela(){
     temp = [];
     shapes = [];
     texto_tela = [];
+    lista_circ = [];
+    for (let i = 0; i < lista_eqs.length; i++){
+        lista_eqs[i].elt.remove();
+    }
+    lista_eqs = [];
     emitDrawing();
 }
 
