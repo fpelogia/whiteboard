@@ -125,7 +125,6 @@ function changeColor(){
     console.log(currentColor);
 }
 
-
 function drawShape(shlist){
     noFill();
     strokeJoin(ROUND);
@@ -205,8 +204,8 @@ function confirmaTexto(){
         //convert();
         //img = new p5.Element(output);
         eq = createDiv("");
-        eq.style('margin-left', '20%');
-        eq.style('margin-top', '82px');
+        eq.style('margin-left', '500px');
+        eq.style('margin-top', '120px');
         eq.style('border', '1px solid grey');
         eq.position(0, 0);
         eq.style("font-size","160%");
@@ -374,17 +373,22 @@ function mouseDragged(){
             if(is_creating_text_box != 1){
                 break;
             }
-            caixaTexto.position(x1_text + 455, y1_text +87);
+            caixaTexto.position(x1_text + 500, y1_text + 120);
             caixaTexto.style('width', mouseX - x1_text  + 'px');
             caixaTexto.style('height', mouseY - (y1_text ) + 'px');
-            x2_text = mouseX;
+
+            caixaTexto.style("color", currentColor);
+            caixaTexto.style("background", "transparent");
+            caixaTexto.style("border-radius", "15px");
+
+            x2_text = mouseX - x1_text;
             y2_text = mouseY - y1_text;
             break;
         case "latex":
             if(is_creating_text_box != 1){
                 break;
             }
-            caixaLaTeX.position(x1_text + 455, y1_text +87);
+            caixaLaTeX.position(x1_text + 500, y1_text + 120);
             caixaLaTeX.style('width', mouseX - x1_text  + 'px');
             caixaLaTeX.style('height', mouseY - (y1_text ) + 'px');
             x2_text = mouseX;
