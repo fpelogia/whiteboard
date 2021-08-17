@@ -21,6 +21,7 @@ function newConnection(socket){
     console.log('New connection:' + socket.id);
     socket.on('data', dataMsg);
     socket.on('equation', eqMsg);
+    socket.on('eq-rm', eqRmMsg);
 
     function dataMsg(data){
         socket.broadcast.emit('data', data);
@@ -33,6 +34,13 @@ function newConnection(socket){
         socket.broadcast.emit('equation', data);
         //caso precise mandar para o cliente que enviou tbm, usar:
         // io.sockets.emit('equation', data);
+        console.log(data);
+    }
+
+    function eqRmMsg(data){
+        socket.broadcast.emit('eq-rm', data);
+        //caso precise mandar para o cliente que enviou tbm, usar:
+        // io.sockets.emit('eq-rm', data);
         console.log(data);
     }
 }

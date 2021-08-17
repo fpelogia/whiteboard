@@ -1,5 +1,9 @@
+/*
+ *Author: Frederico José Ribeiro Pelogia
+ *Year: 2021
+ */
 body{
-    margin-left: 500px;
+    margin: 10px;
     /*width:60%;*/
 }
 .title{
@@ -14,28 +18,32 @@ p{
     padding:10px;
 }
 .tool-bar{
-    width:200%;
+    width:1360px;
     /*margin-left:-50%;*/
     margin-bottom: 30px;
     text-align:center;
 }
+.radio-label{
+    font-size:18pt;
+}
 .frame{
-    max-width: 40em;
+    max-width: 60em;
   /*  margin: auto;*/
 }
 
 .chk-btn{
-    width:100px;
-    height:80px;
+    width:70px;
+    height:60px;
     display:inline-block;
     text-align:center;
     cursor: pointer;
     background:#e9e9ed;
-    border-radius:20px;
+    border-radius:15px;
     border-style: solid;
     border-width: medium;
     border-color: #8f8f9d;
     margin-right:40px;
+    padding:2px;
 }
 input[type=color]{
     width:50px;
@@ -49,6 +57,9 @@ input[type=range]{
     line-height:28pt;
 }
 button{
+    width:70px;
+    height:70px;
+    padding:0px;
     margin-right:40px;
 }
 input:checked + label{
@@ -67,7 +78,7 @@ input[type=range] {
   height: 32px;
   -webkit-appearance: none;
   margin: 10px 0;
-  width: 100%;
+  width: 30%;
 }
 input[type=range]:focus {
   outline: none;
