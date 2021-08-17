@@ -208,9 +208,9 @@ function newEquation(data){
     var input = data.cmd;
     eq = createSpan("");
     eq.parent('canvasP5');
-    eq.style('margin-left', '500px');
+    eq.style('margin-left', '10px');
     //eq.style('z-index', '-1');
-    eq.style('margin-top', '120px');
+    eq.style('margin-top', '10px');
     eq.position(0, 0);
     eq.style("font-size","160%");
     MathJax.texReset();
@@ -273,9 +273,9 @@ function confirmaTexto(){
         caixaLaTeX.style('display', 'none');
         eq = createSpan("");
         eq.parent('canvasP5');
-        eq.style('margin-left', '500px');
+        eq.style('margin-left', '10px');
         //eq.style('z-index', '-1');
-        eq.style('margin-top', '120px');
+        eq.style('margin-top', '10px');
         eq.style('border', '1px solid grey');
         eq.position(0, 0);
         eq.style("font-size","160%");
@@ -457,7 +457,7 @@ function mouseDragged(){
             if(is_creating_text_box != 1){
                 break;
             }
-            caixaTexto.position(x1_text + 500, y1_text + 120);
+            caixaTexto.position(x1_text + 10, y1_text + 10);
             caixaTexto.style('width', mouseX - x1_text  + 'px');
             caixaTexto.style('height', mouseY - (y1_text ) + 'px');
 
@@ -472,7 +472,7 @@ function mouseDragged(){
             if(is_creating_text_box != 1){
                 break;
             }
-            caixaLaTeX.position(x1_text + 500, y1_text + 120);
+            caixaLaTeX.position(x1_text + 10, y1_text + 10);
             caixaLaTeX.style('width', mouseX - x1_text  + 'px');
             caixaLaTeX.style('height', mouseY - (y1_text ) + 'px');
             x2_text = mouseX;

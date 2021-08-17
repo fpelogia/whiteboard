@@ -21,7 +21,7 @@
     </head>
     <body>
         <div class='frame'>
-            <h1 class='title'>Colaborative Whiteboard with LaTeX support</h1>
+            <!--  <h1 class='title'>Colaborative Whiteboard with LaTeX support</h1> -->
 
             <div id="canvasP5">
                 <!-- Canvas -->
@@ -64,6 +64,9 @@
                     <i class="fas fa-square-root-alt tool-icon"></i>
                 </label>
 
+            </div>
+            <div class='tool-bar'>    
+
                 <input type="color" id="cor" name="cor" value="#000000">       
 
                 <button id='desfazer'  > 
@@ -74,22 +77,26 @@
                 </button>
             </div>
             <div class='tool-bar'>    
-                <p>Line thickness</p>
-                <input type="range" id="raio" name="vol" min="4" max="48" step="4">       
+                <div class='radio-label'>Line thickness</div>
+                <input type="range" id="raio" name="vol" min="4" max="48" step="4" default="8">       
             </div>
             <div class='tool-bar'>    
                 <textarea id="caixa_texto" name="caixa_texto" style="display:none"></textarea>
             </div>
             </div>
         </div>
-<div id="frame">
+    <div id="frame">
+        <textarea id="caixa_latex" rows="15" cols="10" placeholder="% TeX" style="display:none"></textarea>
+        <br clear="all" />
+        <div id="output"></div>
+    </div>
 
-    <textarea id="caixa_latex" rows="15" cols="10" placeholder="% TeX" style="display:none">
-</textarea>
-<br clear="all" />
-<div id="output"></div>
-
-</div>
+    <div id="frame" style="width:1360px; text-align:center">
+        MIT License.<br>
+        Free icons by <a href="https://fontawesome.com/">fontawesome</a>.<br>
+        Equations by <a href="https://www.mathjax.org/">MathJax</a>.<br>
+        Author: Frederico José Ribeiro Pelogia (<a href = "https://github.com/fpelogia"> GitHub </a>)
+    </div>
 
     </body>
 </html>
