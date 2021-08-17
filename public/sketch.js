@@ -50,7 +50,7 @@ function setup(){
     canv.style('margin', '0px');
     canv.style('border', '5px solid');
     //conexão com
-    socket = io.connect('http://localhost:3000');
+    socket = io();
     socket.on('data', newDrawing); 
     socket.on('equation', newEquation); 
     //botão de limpar tela
