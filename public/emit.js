@@ -21,13 +21,6 @@ function emitEquation(){
    socket.emit('equation', data);
 }
 
-function emitHistoryUpdate(){
-    var data = {
-        too: type_of_object
-    }
-    socket.emit('hist', data);
-}
-
 // ========== Recieving Information ==========
 
 function newDrawing(data){
@@ -83,9 +76,5 @@ function newEquation(data){
     eq.position(data.x, data.y);
     lista_eqs.push(eq);
     //type_of_object.push('e');
-    type_of_object = data.too;
-}
-
-function getHistoryUpdate(data){
     type_of_object = data.too;
 }

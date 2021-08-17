@@ -32,7 +32,7 @@ var y1_text = 0;
 var x2_text = 0;
 var y2_text = 0;
 var texto = "";
-var output;
+var fontSizeInp;
 var there_is_temp_eq = false;
 var is_creating_text_box = 0;
 var img;
@@ -72,7 +72,9 @@ function setup(){
     caixaLaTeX = select('#caixa_latex');
     //caixaTexto.input(atualizaTexto);
 
-    output = select('#output');
+    fontSizeInp = select('#font-size');
+    fontSizeInp.changed(changeFontSize);
+    changeFontSize();
 
     strokeWeight(currStrokeWeight);
     background(255); // pinta o fundo de branco
@@ -130,6 +132,10 @@ function undoDrawing(){
 function changeRadius(){
     currStrokeWeight = range.elt.value;
 }
+function changeFontSize(){
+    currFontSize = parseInt(fontSizeInp.elt.value) + 12;
+    caixaTexto.style("font-size", fontSizeInp.elt.value + 'pt');
+}
 function changeColor(){
     currentColor = seletorCor.elt.value;
     console.log(currentColor);
@@ -181,7 +187,7 @@ function escreveTexto(text_el){
     //stroke(text_el.color);
     noStroke();
     fill(text_el.color);
-    textSize(36);
+    textSize(text_el.fs);
     text(text_el.txt, text_el.x1, text_el.y1, text_el.x2, text_el.y2); 
 }
 
@@ -195,55 +201,7 @@ function mouseInsideCanvas(){
     }
 }
 
-function newDrawing(data){
-    texto_tela = data.texto_tela;
-    lista_circ = data.lista_circ;
-    shapes = data.shapes;
-    shapes.push(data.temp);
-    drawShapes();
-}
 
-function newEquation(data){
-
-    var input = data.cmd;
-    eq = createSpan("");
-    eq.parent('canvasP5');
-    eq.style('margin-left', '10px');
-    //eq.style('z-index', '-1');
-    eq.style('margin-top', '10px');
-    eq.position(0, 0);
-    eq.style("font-size","160%");
-    MathJax.texReset();
-    var opts = MathJax.getMetricsFor(eq.elt);
-    last_latex_cmd = input;
-    MathJax.tex2svgPromise(input, opts).then(function (node) {
-      //
-      //  The promise returns the typeset node, which we add to the output
-      //  Then update the document to include the adjusted CSS for the
-      //    content of the new equation.
-      //
-      eq.elt.appendChild(node);
-      MathJax.startup.document.clear();
-      MathJax.startup.document.updateDocument();
-    }).catch(function (err) {
-      //
-      //  If there was an error, put the message into the output instead
-      //
-      eq.elt.appendChild(document.createElement('pre')).appendChild(document.createTextNode(err.message));
-    }).then(function () {
-      //
-      //  Error or not, re-enable the display and render buttons
-      //
-      //button.disabled = display.disabled = false;
-    });
-    //var input = document.getElementById("caixa_latex").value.trim();
-    //img.style('z-index', '-1');
-    //
-
-    eq.position(data.x, data.y);
-    lista_eqs.push(eq);
-    type_of_object.push('e');
-}
 
 function limpaTela(){
     temp = [];
@@ -261,9 +219,9 @@ function atualizaTexto() {
   //console.log(this.value());
   //background(200);
     //
-  textAlign(LEFT, TOP);
-  fill(currentColor);
-  textSize(36);
+  //textAlign(LEFT, TOP);
+  //fill(currentColor);
+  //textSize(currFontSize);
   texto = caixaTexto.value()
   //text(texto, x1_text, y1_text, x2_text, y2_text); 
 }
@@ -310,7 +268,7 @@ function confirmaTexto(){
     }else{
         caixaTexto.style('display', 'none');
         atualizaTexto();
-        texto_tela.push({txt: texto, x1: x1_text, y1: y1_text, x2: x2_text, y2: y2_text, color: currentColor});
+        texto_tela.push({txt: texto, x1: x1_text, y1: y1_text, x2: x2_text, y2: y2_text, color: currentColor, fs:currFontSize});
         type_of_object.push('t');
         is_creating_text_box = 0;
         drawShapes();
@@ -370,7 +328,6 @@ function mouseReleased(){
     //if(mouseInsideCanvas() || mouseLeftCanvas()){
     if(mouseInsideCanvas() && ferramenta != "latex" && ferramenta != "texto" && ferramenta != "circulo" ){
         shapes.push(temp);
-        console.log("opa... novo shape : ", ferramenta);
         type_of_object.push('s');
     }
 
@@ -485,28 +442,6 @@ function mouseDragged(){
    emitDrawing();
 
 }
-
-function emitDrawing(){
-
-   var data = {
-       shapes: shapes,
-       temp: temp,
-       texto_tela: texto_tela,
-       lista_circ: lista_circ
-   }
-   socket.emit('data', data);
-}
-
-function emitEquation(){
-
-   var data = {
-       cmd: last_latex_cmd,
-       x: imx,
-       y: imy
-   }
-   socket.emit('equation', data);
-}
-
 
 function keyPressed(){
   if(keyCode == ENTER){
