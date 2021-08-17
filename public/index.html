@@ -5,10 +5,10 @@
     <title> Whiteboard </title>
     <link rel="stylesheet" href="css/style.css">
 
-    <!-- Importa ícones do Font Awesome-->
+    <!-- Import icons from Font Awesome-->
     <script src="https://kit.fontawesome.com/751ed13538.js" crossorigin="anonymous"></script>
 
-    <!-- Importa socket.io-->
+    <!-- Import socket.io-->
     <script src="https://cdn.socket.io/4.0.2/socket.io.min.js" integrity="sha384-Bkt72xz1toXkj/oEiOgkQwWKbvNYxTNWMqdon3ejP6gwq53zSo48nW5xACmeDV0F" crossorigin="anonymous"></script>
 
     <meta name="viewport" width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0>
@@ -16,7 +16,9 @@
 
     <script src="sketch.js"></script>
     <script src="emit.js"></script>
-    <!-- <meta name="viewport" content="user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1,width=device-width"> -->
+    <script src="draw.js"></script>
+    <script src="misc.js"></script>
+    <meta name="viewport" content="user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1,width=device-width"> 
  
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
@@ -30,34 +32,34 @@
             </div>
             <br><tr>
             <div class='tool-bar'>    
-                <input type='radio' id='pincel' name = 'tool'  checked> 
-                <label class='chk-btn' for='pincel' >
+                <input type='radio' id='paint-brush' name = 'tool'  checked> 
+                <label class='chk-btn' for='paint-brush' >
                     <i class="fas fa-paint-brush tool-icon"></i>
                 </label>
 
-                <input type='radio' id='borracha' name = 'tool' > 
-                <label class='chk-btn' for='borracha'>
+                <input type='radio' id='eraser' name = 'tool' > 
+                <label class='chk-btn' for='eraser'>
                     <i class="fas fa-eraser tool-icon"></i>
                 </label>
 
-                <input type='radio' id='retangulo' name = 'tool' > 
-                <label class='chk-btn' for='retangulo'>
+                <input type='radio' id='rectangle' name = 'tool' > 
+                <label class='chk-btn' for='rectangle'>
                     <i class="far fa-square tool-icon"></i>
                 </label>
 
-                <input type='radio' id='circulo' name = 'tool' > 
-                <label class='chk-btn' for='circulo'>
+                <input type='radio' id='circ' name = 'tool' > 
+                <label class='chk-btn' for='circ'>
                     <i class="far fa-circle tool-icon"></i>
                 </label>
 
-                <input type='radio' id='reta' name = 'tool' > 
-                <label class='chk-btn' for='reta'>
+                <input type='radio' id='line-tool' name = 'tool' > 
+                <label class='chk-btn' for='line-tool'>
                     <i class="fas fa-minus tool-icon"></i>
                 </label>
 
 
-                <input type='radio' id='texto' name = 'tool' > 
-                <label class='chk-btn' for='texto'>
+                <input type='radio' id='text-tool' name = 'tool' > 
+                <label class='chk-btn' for='text-tool'>
                     <i class="fas fa-i-cursor tool-icon"></i>
                 </label>
 
@@ -81,15 +83,15 @@
             </div>
             <div class='tool-bar'>    
                 <div class='radio-label'>Line thickness</div>
-                <input type="range" id="raio" name="vol" min="4" max="48" step="4" value="8">       
+                <input type="range" id="lw-slider" name="vol" min="4" max="48" step="4" value="8">       
             </div>
             <div class='tool-bar'>    
-                <textarea id="caixa_texto" name="caixa_texto" style="display:none"></textarea>
+                <textarea id="text-box" name="text-box" style="display:none"></textarea>
             </div>
             </div>
         </div>
     <div id="frame">
-        <textarea id="caixa_latex" rows="15" cols="10" placeholder="% TeX" style="display:none"></textarea>
+        <textarea id="latex-box" rows="15" cols="10" placeholder="% TeX" style="display:none"></textarea>
         <br clear="all" />
         <div id="output"></div>
     </div>

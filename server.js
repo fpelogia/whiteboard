@@ -1,5 +1,7 @@
-/*Autor: Frederico José Ribeiro Pelogia
- *Fontes: 
+/*
+ *Author: Frederico José Ribeiro Pelogia 
+ *
+ *Reference: 
     [1] - https://youtu.be/2hhEOGXcCvg
  * */
 var express = require('express');
@@ -9,7 +11,7 @@ const PORT = process.env.PORT || 3000;
 var server = app.listen(PORT, () => console.log(`Server is listening on port ${PORT}...`));
 
 app.use(express.static('public'))
-console.log("Servidor rodando!");
+console.log("The server is running!");
 
 //var mj = require("mathjax");
 var socket = require("socket.io");
@@ -21,8 +23,7 @@ function newConnection(socket){
     console.log('New connection:' + socket.id);
     socket.on('data', dataMsg);
     socket.on('equation', eqMsg);
-    socket.on('hist', histMsg);
-
+    socket.on('eq-rm', eqRmMsg);
 
     function dataMsg(data){
         socket.broadcast.emit('data', data);
@@ -38,10 +39,10 @@ function newConnection(socket){
         console.log(data);
     }
 
-    function histMsg(data){
-        socket.broadcast.emit('hist', data);
+    function eqRmMsg(data){
+        socket.broadcast.emit('eq-rm', data);
         //caso precise mandar para o cliente que enviou tbm, usar:
-        // io.sockets.emit('hist', data);
+        // io.sockets.emit('eq-rm', data);
         console.log(data);
     }
 }

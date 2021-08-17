@@ -1,3 +1,9 @@
+/*
+ *Author: Frederico José Ribeiro Pelogia
+ *Year: 2021
+ */
+// This file contains functions that deal with the comunication between users
+ 
 // ========== Sending Information ==========
 function emitDrawing(){
 
@@ -19,6 +25,13 @@ function emitEquation(){
        y: imy
    }
    socket.emit('equation', data);
+}
+
+function emitRemEq(i){
+    var data ={
+        index: i,
+    }
+    socket.emit('eq-rm', data);
 }
 
 // ========== Recieving Information ==========
@@ -69,7 +82,7 @@ function newEquation(data){
       //
       //button.disabled = display.disabled = false;
     });
-    //var input = document.getElementById("caixa_latex").value.trim();
+    //var input = document.getElementById("latex-box").value.trim();
     //img.style('z-index', '-1');
     //
 
@@ -77,4 +90,14 @@ function newEquation(data){
     lista_eqs.push(eq);
     //type_of_object.push('e');
     type_of_object = data.too;
+}
+
+function newRemovedEq(data){
+    if(data.index == -1){
+        limpaTela();
+    }else{
+        console.log("Equation removed")
+        var ult_eq = lista_eqs.pop();
+        ult_eq.elt.remove();
+    }
 }

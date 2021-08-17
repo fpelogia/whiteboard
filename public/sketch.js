@@ -1,6 +1,9 @@
+/*
+ *Author: Frederico José Ribeiro Pelogia
+ *Year: 2021
+ */
 var canv;
 var socket;
-var fr = 60;
 var drawing = false;
 let temp = [];
 let temp_texto = [];
@@ -9,32 +12,32 @@ let shapes = [];
 let texto_tela = [];
 let type_of_object = [];
 var lastMouseStatus;
-var tools = ["pincel",
-             "borracha",
-             "reta",
-             "retangulo",
-             "circulo",
-             "texto",
+var tools = ["paint-brush",
+             "eraser",
+             "line-tool",
+             "rectangle",
+             "circ",
+             "text-tool",
              "latex",
 ];
-var ferramenta = "pincel";
-var limparBtn;
-var range;
-var currStrokeWeight = 4;
-var savedX;
-var savedY;
+var tool = "paint-brush"; //current tool
+var lwSlider;
 var seletorCor;
 var caixaTexto;
 var caixaLaTeX;
+var limparBtn;
+var fontSizeInp;
+var currStrokeWeight = 4;
+var savedX;
+var savedY;
 var currentColor;
 var x1_text = 0;
 var y1_text = 0;
 var x2_text = 0;
 var y2_text = 0;
 var texto = "";
-var fontSizeInp;
 var there_is_temp_eq = false;
-var is_creating_text_box = 0;
+var text_input_status = 0;
 var img;
 var eq;
 var lista_eqs = [];
@@ -45,42 +48,44 @@ var imx;
 var imy;
 
 function setup(){
+    // Canvas setup
     canv = createCanvas(1360,768);
     canv.parent('canvasP5');
     canv.style('margin', '0px');
     canv.style('border', '5px solid');
-    //conexão com
+    // Server connection and message handling
     socket = io();
     socket.on('data', newDrawing); 
     socket.on('equation', newEquation); 
-    //botão de limpar tela
+    socket.on('eq-rm', newRemovedEq); 
+    // Action buttons
     limparBtn = select("#limpar");
     limparBtn.mousePressed(limpaTela);
     limparBtn = select("#desfazer");
     limparBtn.mousePressed(undoDrawing);
-    // seletor de espessura
-    range = select("#raio");
-    range.changed(changeRadius);
-    changeRadius();
-    //seletor de cor
+    // Line Width Selector
+    lwSlider = select("#lw-slider");
+    lwSlider.changed(changeLineWidth);
+    changeLineWidth();
+    // Color Selector
     seletorCor = select('#cor');
     seletorCor.changed(changeColor);
     changeColor();
-    //caixa de texto
-    caixaTexto = select('#caixa_texto');
-    //caixa para inserção dos comandos LaTeX
-    caixaLaTeX = select('#caixa_latex');
-    //caixaTexto.input(atualizaTexto);
-
+    // Text Box
+    caixaTexto = select('#text-box');
+    // TeX Box
+    caixaLaTeX = select('#latex-box');
+    // Font Size Selector
     fontSizeInp = select('#font-size');
     fontSizeInp.changed(changeFontSize);
     changeFontSize();
 
     strokeWeight(currStrokeWeight);
-    background(255); // pinta o fundo de branco
+    background(255); // White Background
 }
-function draw(){
 
+// Main Loop of the project
+function draw(){
     if(there_is_temp_eq && mouseInsideCanvas()){
         imx = mouseX;
         imy = mouseY;
@@ -90,328 +95,78 @@ function draw(){
     lastMouseStatus = mouseInsideCanvas();
 }
 
-function checkTools(){
-    var btn;
-    for (let i = 0; i< tools.length; i++){
-        btn = select("#"+tools[i]);
-        //console.log("ferramenta", tools[i] , " : ", btn.elt.checked);
-        if(btn.elt.checked){
-            if(ferramenta != tools[i] && is_creating_text_box >= 2){
-                switch(is_creating_text_box){
-                    case 2:
-                        confirmaTexto();
-                        break;
-                    case 3:
-                        eq.elt.remove();
-                        is_creating_text_box = 0;
-                        break;
-                }
-            }
-            ferramenta = tools[i];
-        }
-    }
-}
-function undoDrawing(){
-    var ch = type_of_object.pop();
-    if(ch == 't'){
-        console.log("Text removed");
-        texto_tela.pop();
-    }else if(ch == 's'){
-        console.log("Shape removed");
-        shapes.pop();
-    }else if(ch == 'e'){
-        console.log("Equation removed")
-        var ult_eq = lista_eqs.pop();
-        ult_eq.elt.remove();
-    }else if(ch == 'c'){
-        console.log("circle removed")
-        lista_circ.pop();
-    }
+function keyPressed(){
+  if(keyCode == ENTER){
+    confirmaTexto(); // For both Text and TeX
     emitDrawing();
-}
-function changeRadius(){
-    currStrokeWeight = range.elt.value;
-}
-function changeFontSize(){
-    currFontSize = parseInt(fontSizeInp.elt.value) + 12;
-    caixaTexto.style("font-size", fontSizeInp.elt.value + 'pt');
-}
-function changeColor(){
-    currentColor = seletorCor.elt.value;
-    console.log(currentColor);
+  }
 }
 
-function drawShape(shlist){
-    noFill();
-    strokeJoin(ROUND);
-    beginShape();
-    for (let i = 1; i < shlist.length; i++){
-    strokeWeight(shlist[i].sw);
-    stroke(shlist[i].color);
-    line(shlist[i-1].x, shlist[i-1].y,shlist[i].x, shlist[i].y);
-    vertex(shlist[i-1].x, shlist[i-1].y);
-    vertex(shlist[i].x, shlist[i].y);
-    }
-    endShape();
-}
-function drawShapes(){
-    background(255);
-    desenhaCirculos();
-    strokeWeight(1);
-    escreveTextos();
-    noFill();
-    for (let i = 0; i < shapes.length; i++){
-        drawShape(shapes[i]);
-    }
-}
-function desenhaCirculos(){
-    for (let i = 0; i < lista_circ.length; i++){
-        desenhaCirculo(lista_circ[i]);
-    }
-}
-
-function desenhaCirculo(c){
-    noFill();
-    strokeWeight(c.sw);
-    stroke(c.color);
-    circle(c.cx, c.cy, c.r);        
-}
-
-function escreveTextos(){
-    for (let i = 0; i < texto_tela.length; i++){
-        escreveTexto(texto_tela[i]);
-    }
-}
-function escreveTexto(text_el){
-    textAlign(LEFT, TOP);
-    //stroke(text_el.color);
-    noStroke();
-    fill(text_el.color);
-    textSize(text_el.fs);
-    text(text_el.txt, text_el.x1, text_el.y1, text_el.x2, text_el.y2); 
-}
-
-
-
-function mouseInsideCanvas(){
-    if(mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height ){
-        return true;
-    }else{
-        return false;
-    }
-}
-
-
-
-function limpaTela(){
-    temp = [];
-    shapes = [];
-    texto_tela = [];
-    lista_circ = [];
-    for (let i = 0; i < lista_eqs.length; i++){
-        lista_eqs[i].elt.remove();
-    }
-    lista_eqs = [];
-    emitDrawing();
-}
-
-function atualizaTexto() {
-  //console.log(this.value());
-  //background(200);
-    //
-  //textAlign(LEFT, TOP);
-  //fill(currentColor);
-  //textSize(currFontSize);
-  texto = caixaTexto.value()
-  //text(texto, x1_text, y1_text, x2_text, y2_text); 
-}
-
-function confirmaTexto(){
-    if(ferramenta == 'latex'){
-        caixaLaTeX.style('display', 'none');
-        eq = createSpan("");
-        eq.parent('canvasP5');
-        eq.style('margin-left', '10px');
-        //eq.style('z-index', '-1');
-        eq.style('margin-top', '10px');
-        eq.style('border', '1px solid grey');
-        eq.position(0, 0);
-        eq.style("font-size","160%");
-        MathJax.texReset();
-        var input = caixaLaTeX.elt.value.trim();
-        var opts = MathJax.getMetricsFor(eq.elt);
-        last_latex_cmd = input;
-        MathJax.tex2svgPromise(input, opts).then(function (node) {
-          //
-          //  The promise returns the typeset node, which we add to the output
-          //  Then update the document to include the adjusted CSS for the
-          //    content of the new equation.
-          //
-          eq.elt.appendChild(node);
-          MathJax.startup.document.clear();
-          MathJax.startup.document.updateDocument();
-        }).catch(function (err) {
-          //
-          //  If there was an error, put the message into the output instead
-          //
-          eq.elt.appendChild(document.createElement('pre')).appendChild(document.createTextNode(err.message));
-        }).then(function () {
-          //
-          //  Error or not, re-enable the display and render buttons
-          //
-          //button.disabled = display.disabled = false;
-        });
-        //var input = document.getElementById("caixa_latex").value.trim();
-        //img.style('z-index', '-1');
-        there_is_temp_eq = true;
-        is_creating_text_box = 3;
-    }else{
-        caixaTexto.style('display', 'none');
-        atualizaTexto();
-        texto_tela.push({txt: texto, x1: x1_text, y1: y1_text, x2: x2_text, y2: y2_text, color: currentColor, fs:currFontSize});
-        type_of_object.push('t');
-        is_creating_text_box = 0;
-        drawShapes();
-    }
-}
-
-function mouseReleased(){
-    switch(ferramenta){
-        case "retangulo":
-            temp.push({ x: savedX, y: savedY, color: currentColor, sw: currStrokeWeight});
-            temp.push({ x: savedX, y: mouseY, color: currentColor, sw: currStrokeWeight});
-            temp.push({ x: mouseX, y: mouseY, color: currentColor, sw: currStrokeWeight});
-            temp.push({ x: mouseX, y: savedY, color: currentColor, sw: currStrokeWeight});
-            temp.push({ x: savedX, y: savedY, color: currentColor, sw: currStrokeWeight});
-            break;
-        case "circulo":
-            if(!mouseInsideCanvas()) break;
-            lista_circ.push({ 
-                cx: savedX, 
-                cy: savedY, 
-                r:sqrt((mouseX - savedX)**2 + (mouseY - savedY)**2),
-                color:currentColor,
-                sw: currStrokeWeight
-            });             
-            type_of_object.push('c');
-            break;
-        case "reta":
-            temp.push({ x: savedX, y: savedY, color: currentColor, sw: currStrokeWeight});
-            temp.push({ x: mouseX, y: mouseY, color: currentColor, sw: currStrokeWeight});
-            break;
-        case "texto":
-            if(is_creating_text_box != 1){
-                break;
-            }
-            is_creating_text_box = 2;
-            break;
-        case "latex":
-            if(mouseInsideCanvas() == 0) 
-                break;
-            if(is_creating_text_box == 3){
-                eq.style('border', 'none');
-                is_creating_text_box = 0;
-                lista_eqs.push(eq);
-                type_of_object.push('e');
-                emitEquation();
-            }
-            there_is_temp_eq = false;
-            if(is_creating_text_box != 1){
-                break;
-            }
-            is_creating_text_box = 2;
-            break;
-        default:
-            break;
-    }
-
-    //if(mouseInsideCanvas() || mouseLeftCanvas()){
-    if(mouseInsideCanvas() && ferramenta != "latex" && ferramenta != "texto" && ferramenta != "circulo" ){
-        shapes.push(temp);
-        type_of_object.push('s');
-    }
-
-    temp = []
-    background(255);
-    drawShapes();
-    emitDrawing();
-}
 function mousePressed(){
-    if(ferramenta == "retangulo" || ferramenta == "reta" || ferramenta == "circulo"){
+    if(tool == "rectangle" || tool == "line-tool" || tool == "circ"){
         savedX = mouseX;
         savedY = mouseY;
     }
-    if(ferramenta == "texto" && mouseInsideCanvas() && is_creating_text_box != 2){
+    if(tool == "text-tool" && mouseInsideCanvas() && text_input_status != 2){
         x1_text = mouseX;
         y1_text = mouseY;
-        if(is_creating_text_box == 0){
+        if(text_input_status == 0){
             caixaTexto.style('display', 'block');
-            is_creating_text_box = 1;
+            text_input_status = 1;
         }
     }
-    if(ferramenta == "latex" && mouseInsideCanvas() && is_creating_text_box < 2){
+    if(tool == "latex" && mouseInsideCanvas() && text_input_status < 2){
         x1_text = mouseX;
         y1_text = mouseY;
-        if(is_creating_text_box == 0){
+        if(text_input_status == 0){
             caixaLaTeX.style('display', 'block');
-            is_creating_text_box = 1;
+            text_input_status = 1;
         }
-    }
-}
-function mouseLeftCanvas(){
-    if(mouseIsPressed && mouseInsideCanvas != lastMouseStatus && !mouseInsideCanvas()){
-        lastMouseStatus = mouseInsideCanvas();
-        return true;
-    }else{
-        return false;
     }
 }
 
 function mouseDragged(){
     drawing = true;
     strokeWeight(currStrokeWeight);
-    switch(ferramenta){
-        case "pincel":
+    switch(tool){
+        case "paint-brush":
             stroke(currentColor);
             line(pmouseX, pmouseY, mouseX, mouseY);
             temp.push({ x: pmouseX, y: pmouseY, color: currentColor, sw: currStrokeWeight});
             temp.push({ x: mouseX, y: mouseY , color: currentColor, sw: currStrokeWeight});
             break;
-        case "borracha":
-            stroke(255);//branco
+        case "eraser":
+            stroke(255);// White 
             line(pmouseX, pmouseY, mouseX, mouseY);
             temp.push({ x: pmouseX, y: pmouseY, color: '#ffffff', sw: currStrokeWeight});
             temp.push({ x: mouseX, y: mouseY , color: '#ffffff',  sw: currStrokeWeight});
             break;    
-        case "retangulo":
+        case "rectangle":
             background(255);
             drawShapes();
             noFill()
             strokeWeight(currStrokeWeight);
             stroke(currentColor);
-            rect(savedX, savedY, mouseX - savedX, mouseY - savedY);
-            // apenas para visualização. armazenamento é feito no mouseReleased
+            rect(savedX, savedY, mouseX - savedX, mouseY - savedY);// Just for user preview...
             break;
-        case "circulo":
+        case "circ":
             background(255);
             drawShapes();
             noFill()
             strokeWeight(currStrokeWeight);
             stroke(currentColor);
-            circle(savedX,savedY,sqrt((mouseX - savedX)**2 + (mouseY - savedY)**2));             
-            // apenas para visualização. armazenamento é feito no mouseReleased
+            circle(savedX,savedY,sqrt((mouseX - savedX)**2 + (mouseY - savedY)**2));// Just for user preview...
             break;
-        case "reta":
+        case "line-tool":
             background(255);
             drawShapes();
             noFill()
             stroke(currentColor);
             strokeWeight(currStrokeWeight);
-            line(savedX, savedY, mouseX, mouseY);
-            // apenas para visualização. armazenamento é feito no mouseReleased
+            line(savedX, savedY, mouseX, mouseY);// Just for user preview...
             break;
-        case "texto":
-            if(is_creating_text_box != 1){
+        case "text-tool":
+            if(text_input_status != 1){
                 break;
             }
             caixaTexto.position(x1_text + 10, y1_text + 10);
@@ -426,7 +181,7 @@ function mouseDragged(){
             y2_text = mouseY - y1_text;
             break;
         case "latex":
-            if(is_creating_text_box != 1){
+            if(text_input_status != 1){
                 break;
             }
             caixaLaTeX.position(x1_text + 10, y1_text + 10);
@@ -438,15 +193,66 @@ function mouseDragged(){
         default:
             break;
    }
-
-   emitDrawing();
-
+   emitDrawing(); // Send message to other users
 }
 
-function keyPressed(){
-  if(keyCode == ENTER){
-    confirmaTexto();
+function mouseReleased(){
+    switch(tool){
+        case "rectangle":
+            temp.push({ x: savedX, y: savedY, color: currentColor, sw: currStrokeWeight});
+            temp.push({ x: savedX, y: mouseY, color: currentColor, sw: currStrokeWeight});
+            temp.push({ x: mouseX, y: mouseY, color: currentColor, sw: currStrokeWeight});
+            temp.push({ x: mouseX, y: savedY, color: currentColor, sw: currStrokeWeight});
+            temp.push({ x: savedX, y: savedY, color: currentColor, sw: currStrokeWeight});
+            break;
+        case "circ":
+            if(!mouseInsideCanvas()) break;
+            lista_circ.push({ 
+                cx: savedX, 
+                cy: savedY, 
+                r:sqrt((mouseX - savedX)**2 + (mouseY - savedY)**2),
+                color:currentColor,
+                sw: currStrokeWeight
+            });             
+            type_of_object.push('c');
+            break;
+        case "line-tool":
+            temp.push({ x: savedX, y: savedY, color: currentColor, sw: currStrokeWeight});
+            temp.push({ x: mouseX, y: mouseY, color: currentColor, sw: currStrokeWeight});
+            break;
+        case "text-tool":
+            if(text_input_status != 1){
+                break;
+            }
+            text_input_status = 2;
+            break;
+        case "latex":
+            if(mouseInsideCanvas() == 0) 
+                break;
+            if(text_input_status == 3){
+                eq.style('border', 'none');
+                text_input_status = 0;
+                lista_eqs.push(eq);
+                type_of_object.push('e');
+                emitEquation();
+            }
+            there_is_temp_eq = false;
+            if(text_input_status != 1){
+                break;
+            }
+            text_input_status = 2;
+            break;
+        default:
+            break;
+    }
+
+    if(mouseInsideCanvas() && tool != "latex" && tool != "text-tool" && tool != "circ" ){
+        shapes.push(temp);
+        type_of_object.push('s');
+    }
+
+    temp = []
+    background(255);
+    drawShapes();
     emitDrawing();
-  }
 }
-
