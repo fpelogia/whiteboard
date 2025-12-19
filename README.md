@@ -2,7 +2,7 @@
 ## Vídeo com a Ideia
 [![IMAGE ALT TEXT](http://img.youtube.com/vi/1wKecN7MMvU/0.jpg)](http://www.youtube.com/watch?v=1wKecN7MMvU "Video Title")
 
-## [Clique aqui para experimentar](public/)
+## [Clique aqui para experimentar](https://fpelogia.github.io/whiteboard/public/)
 ------------
 
 ## Requisitos
